@@ -26,7 +26,7 @@ class kintaiActions extends sfActions
   public function executeIndex(sfWebRequest $request)
   {
     //definition
-
+    //testtest
     $service = self::getZendGdata();
     $Id = $this->getRequestParameter('id');
     $member_id = isset($Id) ? $Id : $this->getUser()->getMemberId();
