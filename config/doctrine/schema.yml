@@ -1,0 +1,12 @@
+options:
+  charset: utf8
+
+Kintai:
+  actAs: [Timestampable]
+  columns:
+    member_id: { type: integer(4), notnull: true }
+    start:     { type: string, notnull: true }
+    end:       { type: string, notnull: true }
+    rest:      { type: string, notnull: true }
+  relations:
+    Member: { foreign: id, onDelete: cascade }
