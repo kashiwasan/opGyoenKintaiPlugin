@@ -1,3 +1,9 @@
 $(function(){
-  $("a[rel^='prettyPopin']").prettyPopin({width:500 height:300});
+  $("a[rel^='prettyPopin']").prettyPopin({
+    width: 500,
+    height: 350,
+    callback: function(){
+      location.href= "./kintai";
+    }
+  });
 });
