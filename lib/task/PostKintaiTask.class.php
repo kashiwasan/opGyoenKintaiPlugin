@@ -13,7 +13,7 @@ class PostKintaiTask extends sfBaseTask
 
   public function execute($arguments = array(), $options = array()){
     echo "START KINTAI BOT.";
-    $detail = array();
+    $details = array();
     $databaseManager = 	new sfDatabaseManager($this->configuration);
     $y = date('Y');
     $m = date('m');
@@ -62,8 +62,28 @@ class PostKintaiTask extends sfBaseTask
           $em = substr($data, 7, 2);
           $rh = floor($rest / 60);
           $rm = $rest - ( $rh * 60 ) 
-          $detail[$d] = array('year' => $y, 'month' => $m, 'date' => $d, 'keitai' => $keitai, 'sh' => $sh, 'sm' => $sm, 'eh' => $eh, 'em' => $em, 'rh' => $rh, 'rm' => $rm);
+          if($keitai=="S"){
+            $details[$d] = array('year' => $y, 'month' => $m, 'date' => $d, 'ssh' => $sh, 'ssm' => $sm, 'seh' => $eh, 'sem' => $em, 'srh' => $rh, 'srm' => $rm);
+          }else{
+            $details[$d] = array('year' => $y, 'month' => $m, 'date' => $d, 'zsh' => $sh, 'zsm' => $sm, 'zeh' => $eh, 'zem' => $em, 'zrh' => $rh, 'zrm' => $rm);
+          }
         }
+      }
+      $d1 = $d + 1;
+      for($i=1;$i<$d1;$i++){
+        if(is_null($details[$i])){
+          $details[$i] = array('year' => $y, 'month' => $m, 'date' => $d);
+        }
+      }
+      foreach($details as $detail){
+        $s = new Zend_Gdata_Spreadsheets_ListQuery();
+        $s->setSpreadsheetkey(opConfig::get('op_kintai_spkey'));
+        $s->setWorkSheetId($config);
+        $query = "id={$memberId} and year={$detail['year']} and month={$detail['month']} and date={$detail['date']}";
+        $s->setSpreadsheetQuery($query);
+        $lineList = $service->getListFeed($s);
+        $update = $service->updateRow($lineList->entries['0'], $detail);
+        if($update){ echo "Success!"; }
       }
     }
   }
