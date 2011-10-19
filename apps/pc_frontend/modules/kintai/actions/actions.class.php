@@ -37,15 +37,15 @@ class kintaiActions extends sfActions
     $Y = is_null($y)? date("Y") : $y; 
     $m = $this->getRequestParameter('month');
     $M = is_null($m)? date("m") : $m;
-
+    $wid = self::getRowId();
     //throw query
     $q = new Zend_Gdata_Spreadsheets_ListQuery();
     $q->setSpreadsheetKey(opConfig::get('op_kintai_spkey', null));
-    $q->setWorksheetId(opConfig::get('op_kintai_spwid', null));
+    $q->setWorksheetId($wid);
     // $q->setSingleEvents(true);
     $query = "id={$member_id} and year={$Y} and month={$M}";
     $q->setSpreadsheetQuery($query);
-    $q->setOrderBy('created');
+    // $q->setOrderBy('created');
     $line = $service->getListFeed($q);
 
     if($line){
@@ -68,6 +68,7 @@ class kintaiActions extends sfActions
   public function executeSend2(sfWebRequest $request)
   {
     $service = self::getZendGdata();
+    $wid = self::getRowId();
     if($request->isMethod(sfWebRequest::POST)){
       //Definition
       $memberId = $this->getUser()->getMemberId();
@@ -122,7 +123,7 @@ class kintaiActions extends sfActions
 
       $q = new Zend_Gdata_Spreadsheets_ListQuery();
       $q->setSpreadsheetKey(opConfig::get('op_kintai_spkey', null));
-      $q->setWorksheetId(opConfig::get('op_kintai_spwid', null));
+      $q->setWorksheetId($wid);
       $query = "id={$memberId} and year={$y} and month={$m} and date={$d}";
       $q->setSpreadsheetQuery($query);
       $line = $service->getListFeed($q);
@@ -152,18 +153,12 @@ class kintaiActions extends sfActions
           'year' => $y,
           'month' => $m,
           'date' => $d,
-          // 'keitai' => $keitai,
-          // 'start' => $start["r"],
-          // 'end' => $end["r"],
           'rest' => $rest,
-          // 'jitsumu' => $j["r"],
           'data' => $data,
           'comment' => $comment,
-          // 'created' => $ymdhis,
-          // 'updated' => $ymdhis,
           );
         $arr = array();
-        $spdata = $service->insertRow($rowData, opConfig::get('op_kintai_spkey', null), opConfig::get('op_kintai_spwid', null));
+        $spdata = $service->insertRow($rowData, opConfig::get('op_kintai_spkey', null), $wid);
         if($spdata){
           $arr = array('status' => 'ok', 'msg' => '勤怠を保存しました。お疲れ様です。');
         }else{
@@ -172,65 +167,47 @@ class kintaiActions extends sfActions
       }
       return $this->renderText(json_encode($arr));
     }else{
-      $this->redirect('kintai/regist');
+      $this->redirect('kintai');
       exit;
     }
   }
 
   public function executeAjaxRegist(sfWebRequest $request){
-    $nickname = $this->getUser()->getMember()->getName();
+    $this->nickname = $this->getUser()->getMember()->getName();
     $y = $request->getParameter('y');
       if(empty($y)){ $y = date('Y'); }
     $m = $request->getParameter('m');
       if(empty($m)){ $m = date('m'); }
     $d = $request->getParameter('d');
       if(empty($d)){ $d = date('d'); }
- 
-    $html[]= "<script type=\"text/javascript\">";
-    $html[]= "$(function(){";
-    $html[]= "  $(\"#kintai_regist_loading\").hide();";
-    $html[]= "    $(\"#kintai_regist_submit\").click(function(){";
-    $html[]= "      $(\"#kintai_regist_loading\").show();";
-    $html[]= "      $(\"#regist_msg\").hide();";
-    $html[]= "      Data = $(\"#kintai_regist_data\").val();";
-    $html[]= "      Rest = $(\"#kintai_regist_rest\").val();";
-    $html[]= "      Comment = $(\"#kintai_regist_comment\").val();";
-    $html[]= "      $.ajax({";
-    $html[]= "        type: \"POST\",";
-    $html[]= "        url: \"./kintai/send2\",";
-    $html[]= "        dataType: \"json\",";
-    $html[]= "        data: { \"data\":Data, \"rest\":Rest, \"comment\":Comment, \"y\": {$y}, \"m\": {$m}, \"d\": {$d}},";
-    $html[]= "        success: function(json){";
-    $html[]= "          $(\"#kintai_regist_loading\").hide();";
-    $html[]= "          if(json.status=\"ok\"){";
-    $html[]= "            $(\"#regist_msg\").fadeIn(\"1000\").css(\"color\", \"#00FF00\").html(json.msg);";    
-    $html[]= "          }";
-    $html[]= "          if(json.status=\"err\"){";
-    $html[]= "            $(\"#regist_msg\").fadeIn(\"1000\").css(\"color\", \"#FF0000\").html(json.msg);";    
-    $html[]= "          }";
-    $html[]= "        }";    
-    $html[]= "    });";
-    $html[]= "    return false;";    
-    $html[]= "  });";
-    $html[]= "});";
-    $html[]= "</script>";
-    $html[]= "<div class=\"partsHeading\"><h3>{$nickname}さんの今日の勤怠を登録する</h3></div>";
-    $html[]= "<div class=\"block\">";
-    $html[]= "<div id=\"kintai_regist_loading\" style=\"display: none;\"><img src=\"./opGyoenKintaiPlugin/js/loading.gif\" alt=\"Now Loading...\" /></div>";
-    $html[]= "<div id=\"regist_msg\"></div>";
-    $html[]= "<table>";
-    $html[]= "<tr><td>今日の日付</td><td>".date("Y/m/d H:i:s")."</td></tr>";
-    $html[]= "<tr>";
-    $html[]= "<td><label for=\"data\">勤怠入力</label></td><td><input type=\"text\" id=\"kintai_regist_data\" name=\"data\" value=\"\" maxlength=\"9\" /></td></tr>";
-    $html[]= "<tr>";
-    $html[]= "<td><label for=\"rest\">休憩時間(分単位)</label></td><td><input type=\"text\" id=\"kintai_regist_rest\" name=\"rest\" value=\"\" maxlength=\"3\"></td></tr>";
-    $html[]= "<tr>";
-    $html[]= "<td><label for=\"comment\">作業内容コメント</label></td><td><textarea name=\"comment\" id=\"kintai_regist_comment\"></textarea></td></tr>";
-    $html[]= "<tr><td></td><td><input type=\"submit\" name=\"submit\" id=\"kintai_regist_submit\" value=\"確認する\" /></td></tr></table>";
-    $html[]= "</div>";
-    $htmls = implode("\n", $html );
-    return $this->rendertext($htmls);
+
+    $this->data = $request->getParameter('keitai').$request->getParameter('sh').$request->getparameter('sm').$request->getparameter('eh').$request->getParameter('em');
+    $this->rest = $request->getParameter('rest');
+    $this->comment = $request->getParameter('comment');
+
+    $this->y = $y;
+    $this->m = $m;
+    $this->d = $d;
+    $this->setLayout(false);
+    return sfView::SUCCESS;
   }
+
+
+  public function executeAjaxRegistEasy(sfWebRequest $request){
+    $this->nickname = $this->getUser()->getMember()->getName();
+    $y = $request->getParameter('y');
+      if(empty($y)){ $y = date('Y'); }
+    $m = $request->getParameter('m');
+      if(empty($m)){ $m = date('m'); }
+    $d = $request->getParameter('d');
+      if(empty($d)){ $d = date('d'); }
+    $this->y = $y;
+    $this->m = $m;
+    $this->d = $d;
+    $this->setLayout(false);
+    return sfView::SUCCESS;
+  }
+
 
   public function executeAjaxEdit(sfWebRequest $request){
     $memberId = $this->getUser()->getMemberId();
@@ -239,9 +216,10 @@ class kintaiActions extends sfActions
     $m = $request->getParameter('m');
     $d = $request->getParameter('d');
     $service = self::getZendGdata();
+    $wid = self::getRowId();
     $q = new Zend_Gdata_Spreadsheets_ListQuery();
     $q->setSpreadsheetKey(opConfig::get('op_kintai_spkey', null));
-    $q->setWorksheetId(opConfig::get('op_kintai_spwid', null));
+    $q->setWorksheetId($wid);
     // $q->setSingleEvents(true);
     $query = "id={$memberId} and year={$y} and month={$m} and date={$d}";
     $q->setSpreadsheetQuery($query);
@@ -250,67 +228,11 @@ class kintaiActions extends sfActions
     if(!$listFeed->entries["0"]){
       return $this->renderText("この日の勤怠は存在しないか、既に編集不可能です。");
     }else{
-      $rest = array();
-      $html[]= "<script type=\"text/javascript\">";
-      $html[]= "$(function(){";
-      $html[]= "  $(\"#kintai_loading\").hide();";
-      $html[]= "  $(\"#kintai_submit\").click(function(){";
-      $html[]= "    $(\"#msg\").hide();";
-      $html[]= "    $(\"#kintai_loading\").show();";
-      $html[]= "    $(\"#kintai_table\").hide();";
-      $html[]= "    Data = $(\"#kintai_data\").val();";
-      $html[]= "    Rest = $(\"#kintai_rest\").val();";
-      $html[]= "    Comment = $(\"#kintai_comment\").val();";
-      $html[]= "    $.ajax({";
-      $html[]= "      type: \"POST\",";
-      $html[]= "      url: \"./kintai/ajaxSend\",";
-      $html[]= "      dataType: \"json\",";
-      $html[]= "      data: { \"data\":Data, \"rest\":Rest, \"comment\":Comment, \"y\":{$y}, \"m\":{$m}, \"d\":{$d} },";
-      $html[]= "      success: function(json){";
-      $html[]= "        if(json.status=\"ok\"){";
-      $html[]= "          $(\"#msg\").fadeIn(1000).css(\"color\", \"#00FF00\").html(json.msg);";
-      $html[]= "        }";
-      $html[]= "        if(json.status=\"err\"){";
-      $html[]= "          $(\"#msg\").fadeIn(1000).css(\"color\", \"#FF0000\").html(json.msg);";
-      $html[]= "        }";
-      $html[]= "        $(\"#kintai_loading\").hide();";
-      $html[]= "        $(\"#kintai_table\").show();";
-      $html[]= "      },";
-      $html[]= "    });";
-      $html[]= "  return false;";
-      $html[]= "  });";
-      $html[]= "});";
-      $html[]= "</script>";
-      $html[]= "";
-      $html[]= "<div class=\"partsHeading\"><h3>{$member_name}さんの{$y}年{$m}月{$d}日の勤怠を編集する</h3></div>";
-      $html[]= "<div class=\"block\">";
-      $html[]= "<div id=\"msg\"></div>";
-      $html[]= "<div id=\"kintai_loading\"><img src=\"./opGyoenKintaiPlugin/css/images/prettyPopin/loader.gif\" alt=\"Now Loading...\"/></div>";
-      $html[]= "<table id=\"kintai_table\">";
-
       foreach($listFeed->entries as $entry){
         $line_list = $entry->getCustom();
         foreach($line_list as $line){
           $key = $line->getColumnName();
           switch($key){
-          /****************************
-            case "keitai":
-              $keitai = $line->getText();
-            case "start":
-              $start = str_replace(":", "", $line->getText());
-              if(strlen($start)==5){
-                $start = "0".$start;
-              }
-              $start = mb_substr($start, "0", "4");
-            case "end":
-              $end = str_replace(":", "", $line->getText());
-              if(strlen($end)==5){
-                $end = "0".$end;
-                $end = mb_substr($end, "0", "4");
-              }else{
-                $end = mb_substr($end, "0", "4");
-              }
-          ******************************/
             case "data":
               $data = $line->getText();
             case "rest":
@@ -319,25 +241,29 @@ class kintaiActions extends sfActions
               $comment = $line->getText();
           }
         }
-
-          $html[]= "<tr><td>勤怠入力</td><td><input type=\"text\" name=\"kintai_data\" value=\"{$data}\" maxlength=\"9\" id=\"kintai_data\" /></td></tr>";
-          $html[]= "<tr><td>休憩時間(分単位)</td><td><input type=\"text\" name=\"kintai_rest\" value=\"{$rest}\" maxlength=\"3\" id=\"kintai_rest\" /></td></tr>";
-          $html[]= "<tr><td>作業内容コメント</td><td><textarea name=\"kintai_comment\" id=\"kintai_comment\">{$comment}</textarea></td></tr>";
-
+          $this->nickname = $member_name;
+          $this->y = $y;
+          $this->m = $m;
+          $this->d = $d;
+          $this->data = $data;
+          $this->rest = $rest;
+          $this->comment = $comment;
       }
-      $html[]= '<tr><td></td><td><input type="submit" name="submit" id="kintai_submit" value="修正する" /></td></tr>';
-      $html[]= '</table>';
-      $html[]= '</div>';
-      $htmls = implode("\n", $html);
-      return $this->renderText($htmls);
+
+      $this->y = $y;
+      $this->m = $m;
+      $this->d = $d;
+      $this->data = $data;
+      $this->rest = $rest;
+      $this->comment = $comment;
+      $this->setLayout(false);
+      return sfView::SUCCESS;
     }
-
-
-
   }
 
   public function executeAjaxSend(sfWebRequest $request){
     $service = self::getZendGdata();
+    $wid = self::getRowId();
     if($request->isMethod(sfWebRequest::POST)){
       $y = $request->getParameter('y');
       $m = $request->getParameter('m');
@@ -381,7 +307,7 @@ class kintaiActions extends sfActions
       
      $q = new Zend_Gdata_Spreadsheets_ListQuery();
      $q->setSpreadsheetKey(opConfig::get('op_kintai_spkey', null));
-     $q->setWorksheetId(opConfig::get('op_kintai_spwid', null));
+     $q->setWorksheetId($wid);
      $query = "id={$memberId} and year={$y} and month={$m} and date={$d}";
      $q->setSpreadsheetQuery($query);
      $line = $service->getListFeed($q);
@@ -391,7 +317,7 @@ class kintaiActions extends sfActions
      }else{
        $lineList = $line->entries["0"]->getCustom();
        foreach($lineList as $rows){
-         $key = $rows->getColumnname();
+         $key = $rows->getColumnName();
          switch($key){
            case "year":
              $y = $rows->getText();
@@ -431,16 +357,10 @@ class kintaiActions extends sfActions
           'id' => $memberId,
           'year' => $y,
           'month' => $m,
-          'date' => $d, 
-          //'keitai' => $keitai,
-          //'start' => $start["r"],
-          //'end' => $end["r"],
+          'date' => $d,
           'rest' => $rest,
-          //'jitsumu' => $j["r"],
           'data' => $data,
           'comment' => $comment,
-          //'created' => $ymdhis,
-          //'updated' => $ymdhis,
         );
         $arr = array();
         $spdata = $service->updateRow($line->entries['0'], $rowData);
@@ -456,26 +376,51 @@ class kintaiActions extends sfActions
     }
   }
 
-  private function generate_hash($memberId)
-  {
-    $d = time() - 10800;
-//    $date = date('Y-m-d', $d)
-//  $hash = $date.'-'.$memberId;
-    return sha1($d);
-  }
-
   private function getZendGdata()
   {
-  //    require_once('Zend/Loader.php');
-  //    Zend_Loader::loadClass('Zend_Gdata');
-  //    Zend_Loader::loadClass('Zend_Gdata_ClientLogin');
-  //    Zend_Loader::loadClass('Zend_Gdata_Spreadsheets');
-
     $id = Doctrine::getTable('SnsConfig')->get('op_kintai_spid');
     $pw = Doctrine::getTable('SnsConfig')->get('op_kintai_sppw');
     $service = Zend_Gdata_Spreadsheets::AUTH_SERVICE_NAME;
     $client = Zend_Gdata_ClientLogin::getHttpClient($id, $pw, $service);
     return new Zend_Gdata_Spreadsheets($client);
+  } 
+
+  private function getMemberWorkSheetId($memberId){
+    $service = self::getZendGdata();
+    $member = Doctrine::getTable('Member')->find($memberId);
+    $memberEmailAddress = $member->getEmailAddress(false);
+    $memberEmailAddressUserName  = explode("@", $memberEmailAddress);
+    $worksheetname = $memberEmailAddressUserName[0];
+    $DocumentQuery = new Zend_Gdata_Spreadsheets_DocumentQuery();
+    $DocumentQuery->setSpreadsheetKey(opConfig::get('op_kintai_spkey'));
+    $SpreadsheetFeed = $service->getWorksheetFeed($DocumentQuery);
+    $i = 0;
+    foreach($SpreadsheetFeed->entries as $WorksheetEntry) {
+      $worksheetId = split('/', $SpreadsheetFeed->entries[$i]->id->text);
+      if($WorksheetEntry->title->text===$worksheetname){
+         $WorksheetId = $worksheetId[8];
+         break;
+      }
+      $i++;
+    }
+    return $WorksheetId;
   }
-  
+
+  private function getRowId(){
+    $service = self::getZendGdata();
+    $worksheetname = "ROW";
+    $DocumentQuery = new Zend_Gdata_Spreadsheets_DocumentQuery();
+    $DocumentQuery->setSpreadsheetKey(opConfig::get('op_kintai_spkey'));
+    $SpreadsheetFeed = $service->getWorksheetFeed($DocumentQuery);
+    $i = 0;
+    foreach($SpreadsheetFeed->entries as $WorksheetEntry) {
+      $worksheetId = split('/', $SpreadsheetFeed->entries[$i]->id->text);
+      if($WorksheetEntry->title->text===$worksheetname){
+         $WorksheetId = $worksheetId[8];
+         break;
+      }
+      $i++;
+    }
+    return $WorksheetId;
+  }
 }

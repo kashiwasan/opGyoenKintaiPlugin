@@ -1,4 +1,6 @@
 <?php
+ini_set('include_path', '/var/www/local.kashiwa.jp/sns/lib/vendor');
+
 class PostKintaiTask extends sfBaseTask
 {
   public function configure()
@@ -12,47 +14,49 @@ class PostKintaiTask extends sfBaseTask
   }
 
   public function execute($arguments = array(), $options = array()){
-    echo "START KINTAI BOT.";
+    echo "START KINTAI BOT.\n";
     $details = array();
     $databaseManager = 	new sfDatabaseManager($this->configuration);
     $y = date('Y');
     $m = date('m');
-    $d = date('d');
-    $service = opGyoenKintaiPluginUtil::getZendGdata(opConfig::get('op_kintai_spid'), opConfig::get('op_kintai_sppw'));
+    $nowday = date('d');
+    $service = self::getZendGdata();
     $members = Doctrine::getTable('Member')->findAll();
     foreach($members as $member){
       $memberId = $member->getId();
-      $memberConfig = Doctrine::getTable('MemberConfig')->findByMemberIdAndName($memberId, 'op_kintai_member_wid');
-      $config = $memberConfig->getValue();
-      $q = new Zend_Gdata_Spreadsheets_ListQuery();
-      $q->setSpreadsheetkey(opConig::get('op_kintai_spkey'));
-      $q->setWorkSheetId(opConfig::get('op_kintai_spwid'));
-      $query = "id={$memberId} and y={$y} and m={$m}";
-      $q->setSpreadsheetQuery($query);
-      $line_list = $service->getListFeed($q);
-      foreach($line_list->entries as $entry){
-        $line = $entry->getCustom();
-        foreach($line as $list){
-          $key = $line->getColumnName();
-          switch($key){
-            case "year":
-              $y = $list->getValue();
-              break;
-            case "month": 
-              $m = $list->getValue();
-              break;
-            case "date":
-              $d = $list->getValue();
-              break;
-            case "data":
-              $d = $list->getValue();
-              break;
-            case "rest":
-              $rest = $list->getValue();
-              break;
-            case "comment":
-              $comment = $list->getValue();
-              break;
+      $memberConfig = self::getMemberWorkSheetId($memberId);
+      if($memberConfig){
+        $config = $memberConfig;
+        $q = new Zend_Gdata_Spreadsheets_ListQuery();
+        $q->setSpreadsheetkey(opConfig::get('op_kintai_spkey'));
+        $q->setWorkSheetId(opConfig::get('op_kintai_spwid'));
+        $query = "id={$memberId} and year={$y} and month={$m}";
+        $q->setSpreadsheetQuery($query);
+        $line_list = $service->getListFeed($q);
+        foreach($line_list as $entry){
+          $line = $entry->getCustom();
+          foreach($line as $list){
+            $key = $list->getColumnName();
+            switch($key){
+              case "year":
+                $y = $list->getText();
+                break;
+              case "month": 
+                $m = $list->getText();
+                break;
+              case "date":
+                $d = "{$list->getText()}";
+                break;
+              case "data":
+                $data = $list->getText();
+                break;
+              case "rest":
+                $rest = $list->getText();
+                break;
+              case "comment":
+                $comment = $list->getText();
+                break;
+            }
           }
           $keitai = substr($data, 0, 1);
           // if($keitai=="S"){ $keitai = "出社"; }else{ $keitai = "在宅"; }
@@ -61,32 +65,98 @@ class PostKintaiTask extends sfBaseTask
           $eh = substr($data, 5, 2);
           $em = substr($data, 7, 2);
           $rh = floor($rest / 60);
-          $rm = $rest - ( $rh * 60 ) 
+          $rm = $rest - ( $rh * 60 );
+          if($rh==0){ $rh = "0"; }
+          if($rm==0){ $rm = "0"; }
           if($keitai=="S"){
             $details[$d] = array('year' => $y, 'month' => $m, 'date' => $d, 'ssh' => $sh, 'ssm' => $sm, 'seh' => $eh, 'sem' => $em, 'srh' => $rh, 'srm' => $rm);
-          }else{
+          }
+          if($keitai=="Z"){
             $details[$d] = array('year' => $y, 'month' => $m, 'date' => $d, 'zsh' => $sh, 'zsm' => $sm, 'zeh' => $eh, 'zem' => $em, 'zrh' => $rh, 'zrm' => $rm);
           }
         }
-      }
-      $d1 = $d + 1;
-      for($i=1;$i<$d1;$i++){
-        if(is_null($details[$i])){
-          $details[$i] = array('year' => $y, 'month' => $m, 'date' => $d);
+
+        $month = date('m');
+        if($m==1 || $m==3 || $m==5 || $m==7 || $m==8 || $m==10 || $m==12){
+          $maxday = 31;
+        }elseif($m==2){
+          $maxday = 29;
+        }else{
+          $maxday = 30;
         }
-      }
-      foreach($details as $detail){
-        $s = new Zend_Gdata_Spreadsheets_ListQuery();
-        $s->setSpreadsheetkey(opConfig::get('op_kintai_spkey'));
-        $s->setWorkSheetId($config);
-        $query = "id={$memberId} and year={$detail['year']} and month={$detail['month']} and date={$detail['date']}";
-        $s->setSpreadsheetQuery($query);
-        $lineList = $service->getListFeed($s);
-        $update = $service->updateRow($lineList->entries['0'], $detail);
-        if($update){ echo "Success!"; }
+
+        for($i=1;$i<=$maxday;$i++){
+          if(is_null($details[$i])){
+            unset($details[$i]);
+            $details[$i] = array('year' => $y, 'month' => $m, 'date' => $i);
+          }  
+        }
+        // var_dump($details);
+        foreach($details as $detail){
+          $s = new Zend_Gdata_Spreadsheets_ListQuery();
+          $s->setSpreadsheetkey(opConfig::get('op_kintai_spkey'));
+          $s->setWorkSheetId($config);
+          $query = "year={$detail['year']} and month={$detail['month']} and date={$detail['date']}";
+          $s->setSpreadsheetQuery($query);
+          $lineList = $service->getListFeed($s);
+          $update = $service->updateRow($lineList->entries['0'], $detail);
+          if($update){ echo "Success! member-id : {$memberId}  date: {$detail['year']}/{$detail['month']}/{$detail['date']}\n"; }
+        }
+        unset($details);
+        $line_list = null;
+        $line = null;
+        // var_dump($details);
       }
     }
   }
+
+  public static function getZendGdata() {
+    $id = Doctrine::getTable('SnsConfig')->get('op_kintai_spid');
+    $pw = Doctrine::getTable('SnsConfig')->get('op_kintai_sppw');
+    $service = Zend_Gdata_Spreadsheets::AUTH_SERVICE_NAME;
+    $client = Zend_Gdata_ClientLogin::getHttpClient($id, $pw, $service);
+    return new Zend_Gdata_Spreadsheets($client);
+  }
+
+  private function getMemberWorkSheetId($memberId){
+    $service = self::getZendGdata();
+    $member = Doctrine::getTable('Member')->find($memberId);
+    $memberEmailAddress = $member->getEmailAddress(false);
+    $memberEmailAddressUserName  = explode("@", $memberEmailAddress);
+    $worksheetname = $memberEmailAddressUserName[0];
+    $DocumentQuery = new Zend_Gdata_Spreadsheets_DocumentQuery();
+    $DocumentQuery->setSpreadsheetKey(opConfig::get('op_kintai_spkey'));
+    $SpreadsheetFeed = $service->getWorksheetFeed($DocumentQuery);
+    $i = 0;
+    foreach($SpreadsheetFeed->entries as $WorksheetEntry) {
+      $worksheetId = split('/', $SpreadsheetFeed->entries[$i]->id->text);
+      if($WorksheetEntry->title->text===$worksheetname){
+         $WorksheetId = $worksheetId[8];
+         break;
+      }
+      $i++;
+    }
+    return $WorksheetId;
+  }
+
+  private function getRowId(){
+    $service = self::getZendGdata();
+    $worksheetname = "ROW";
+    $DocumentQuery = new Zend_Gdata_Spreadsheets_DocumentQuery();
+    $DocumentQuery->setSpreadsheetKey(opConfig::get('op_kintai_spkey'));
+    $SpreadsheetFeed = $service->getWorksheetFeed($DocumentQuery);
+    $i = 0;
+    foreach($SpreadsheetFeed->entries as $WorksheetEntry) {
+      $worksheetId = split('/', $SpreadsheetFeed->entries[$i]->id->text);
+      if($WorksheetEntry->title->text===$worksheetname){
+         $WorksheetId = $worksheetId[8];
+         break;
+      }
+      $i++;
+    }
+    return $WorksheetId;
+  }
+
 }
 
 

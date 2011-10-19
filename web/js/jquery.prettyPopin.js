@@ -5,7 +5,7 @@
 	Version: 1.3
 ------------------------------------------------------------------------- */
 
-var _followScroll = false;
+var _followScroll = true;
 var _readyBound = false;
 
 (function($) {

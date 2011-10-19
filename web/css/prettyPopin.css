@@ -14,7 +14,7 @@
 		overflow: hidden;
 		position: absolute; z-index: 11000;
 		top: 50%; left: 50%;
-		background: url(./images/prettyPopin/popinLeft.gif) bottom left no-repeat;
+		background:  #FFFFFF; /* url(./images/prettyPopin/popinLeft.gif) bottom left no-repeat; */
 	}
 	
 		.prettyPopin a#b_close {
@@ -30,7 +30,7 @@
 			position: relative;
 			width: 100%; height: 100%;
 			font-size: 1.2em;
-			background: url(./images/prettyPopin/popinRight.gif) bottom right no-repeat;
+			background: #FFFFFF;  /* url(./images/prettyPopin/popinRight.gif) bottom right no-repeat; */
 		}
 		
 			.prettyPopin .prettyContent .prettyContent-container {

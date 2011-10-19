@@ -45,41 +45,48 @@ class opGyoenKintaiPluginActions extends sfActions
     if($request->isMethod(sfWebRequest::POST))
     {
       $memberId = $request->getParameter('member_id');
-      $member = Doctrine::getTable('Member')->find($memberId, null);
-      if($member==null)
+      $members = Doctrine::getTable('Member')->find($memberId, null);
+      if($members==null)
       {
         return sfView::ERROR;
       }else{
-        $this->member = $member;
+        $this->members = $members;
+        return sfView::SUCCESS;
       }
+   
     }else{
-      $member = Doctrine::getTable('Member')->findAll();
+      $this->members = Doctrine::getTable('Member')->findAll();
+      return sfView::SUCCESS;
     }
       
   }
 
   public function executeEdit(sfWebRequest $request)
   {
+    $this->form = new sfForm();
     if($request->isMethod(sfWebRequest::POST))
     {
       $memberId = $request->getParameter('member_id');
-      $spkey = $request->getParameter('spkey');
-      if(!$memberId || !$spkey)
+      $wid = $request->getParameter('wid');
+      if(!$memberId || !$wid)
       {
         return sfView::ERROR;
       }else{
-        $member = Doctrine::getTable('Member')->find($member_id, null);
+        $member = Doctrine::getTable('Member')->find($memberId, null);
         if($member==null){
           return sfView::ERROR;
         }else{
-          $config = Doctrine::getTable('MemberConfig')->retrieveByNameAndMemberId('kintai_spreadsheet_key', $memberId);
+          $config = Doctrine::getTable('MemberConfig')->retrieveByNameAndMemberId('op_kintai_member_wid', $memberId);
           if(!$config) {
             $config = new MemberConfig();
-            $config->setName('kintai_spreadsheet_key');
+            $config->setName('op_kintai_member_wid');
             $config->setMember($member);
           }
-          $config->setValue($spkey);
+          $config->setValue($wid);
           $config->save();
+          $this->message = "登録しました。";
+          $this->member = $member;
+          $this->value = $wid;
           return sfView::SUCCESS;
         }
       }
@@ -94,13 +101,17 @@ class opGyoenKintaiPluginActions extends sfActions
       $member = Doctrine::getTable('Member')->find($memberId, null);
       if($member==null)
       {
-           $this->redirect('opGyoenKintaiPlugin/list');
-           exit;
+         $this->redirect('opGyoenKintaiPlugin/list');
+         exit;
       }
       $this->member = $member;
-      $config = Doctrine::getTable('memberConfig')->retrieveByNameAndMemberId('kintai_spreadsheet_key', $memberId);
-      $this->value = $config->getValue();
+      $config = Doctrine::getTable('MemberConfig')->retrieveByNameAndMemberId('op_kintai_member_wid', $memberId);
+      if($config){
+        $this->value= $config->getValue();
+      }else{
+        $this->value = "";
+      }
+      return sfView::SUCCESS;
     }
   }
-
 }
