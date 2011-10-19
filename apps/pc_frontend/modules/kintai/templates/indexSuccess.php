@@ -4,6 +4,7 @@
 <tr><td width="15%">年月日</td><td width="10%">作業形態</td><td width="10%">始業時間</td><td width="10%">就業時間</td><td width="10%">休憩</td><td width="10%">実務</td><td width="25%">作業内容</td><td width="10%"></td></tr>
 
 <?php
+
 $html = array();
 $detail = array(); 
 foreach($line as $entry){

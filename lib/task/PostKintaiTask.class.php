@@ -1,6 +1,4 @@
 <?php
-ini_set('include_path', '/var/www/local.kashiwa.jp/sns/lib/vendor');
-
 class PostKintaiTask extends sfBaseTask
 {
   public function configure()
@@ -27,9 +25,10 @@ class PostKintaiTask extends sfBaseTask
       $memberConfig = self::getMemberWorkSheetId($memberId);
       if($memberConfig){
         $config = $memberConfig;
+        $wid = self::getRowId();
         $q = new Zend_Gdata_Spreadsheets_ListQuery();
         $q->setSpreadsheetkey(opConfig::get('op_kintai_spkey'));
-        $q->setWorkSheetId(opConfig::get('op_kintai_spwid'));
+        $q->setWorkSheetId($wid);
         $query = "id={$memberId} and year={$y} and month={$m}";
         $q->setSpreadsheetQuery($query);
         $line_list = $service->getListFeed($q);
