@@ -1,0 +1,49 @@
+■opGyoenKintaiPlugin概要
+OpenPNE3上で勤怠管理ができるようにする。
+勤怠はGoogle SpreadSheet上にて管理する。
+メンバーは自分の勤怠を入力して、過去３日に遡り新規登録・編集ができる。それ以上たってしまった場合は、Spreadsheetで直接編集してください。
+またメンバーは、他のメンバーの勤怠状況を見ることができる。
+
+
+■インストール
+/plugins/に設置
+
+◆設定
+1. OpenPNE3上のZend Frameworkに必要なライブラリが入っていないので、コアのZendFrameworkを書き換える。
+　【書き換え方】OpenPNE3ホームディレクトリに移動。
+ wget http://framework.zend.com/releases/ZendFramework-1.11.11/ZendFramework-1.11.11-minimal.zip
+ unzip ZendFramework-1.11.11-minimal.zip
+ rm -rf lib/vendor/Zend
+ cp ZendFramework-1.11.11-minimal/library/Zend lib/vendor/
+
+2. Google SpreadSheetを新規作成・Spreadsheetキーを取得する。
+　【キーの取得方法】 
+　　該当のSpreadsheetのURLにある、
+　　https://docs.google.com/a/example.com/spreadsheet/ccc?key=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX&hl=ja#gid=1 の
+　　XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXの部分をコピーしておく。
+
+3. 本プラグインに付属しているSheetSample.xlsをGoogle Spreadsheetにインポートする。
+
+4. 続いてSpreadSheetのワークシートの名前を、各メンバーのPCメールアドレスの「@」より前に一致する名前に変更する。
+　※追加でメンバーが必要な場合は、「Template」という名前のワークシートを必要な分だけコピー作成して、そのコピーしたものをそれぞれの対応する名前に変更してやってください。
+
+5. OpenPNE3の管理画面に入り、opGyoenKintaiPluginの設定画面にアクセスする。
+　アクセスしたら、そこに自分のGoogle ID、パスワード、(2. でコピーした)Spreadsheetキーを入力する。
+
+6. CRONの設定をする。これをすることにより、このプラグインが自動で各メンバーのワークシートに整形出力してくれる。
+
+生データをメンバーのワークシートに整形出力するコマンドは
+./symfony opKintai:execute
+
+勤怠報告をアクティビティに投稿して促すコマンドは
+(朝)
+./symfony opKintai:notify morning
+
+(夕)
+./symfony opKintai:notify evening
+
+とそれぞれ実行する。
+
+
+◆TODO
+isuueで管理する。
