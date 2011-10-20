@@ -65,13 +65,20 @@ class PostKintaiTask extends sfBaseTask
           $em = substr($data, 7, 2);
           $rh = floor($rest / 60);
           $rm = $rest - ( $rh * 60 );
+          $starttime = $sh * 60 + $sm;
+          $endtime = $eh * 60 + $em;
+          $jitsumu = $endtime - $starttime - $rest;
+          $jh = floor($jitsumu / 60);
+          $jm = $jitsumu - $jh * 60;
+          if(strlen($jh)==1){ $jh = "0".$jh; }
+          if(strlen($jm)==1){ $jm = "0".$jm; }
           if($rh==0){ $rh = "0"; }
           if($rm==0){ $rm = "0"; }
           if($keitai=="S"){
-            $details[$d] = array('year' => $y, 'month' => $m, 'date' => $d, 'ssh' => $sh, 'ssm' => $sm, 'seh' => $eh, 'sem' => $em, 'srh' => $rh, 'srm' => $rm);
+            $details[$d] = array('year' => $y, 'month' => $m, 'date' => $d, 'ssh' => $sh, 'ssm' => $sm, 'seh' => $eh, 'sem' => $em, 'srh' => $rh, 'srm' => $rm, 'sjh' => $jh, 'sjm' => $jm);
           }
           if($keitai=="Z"){
-            $details[$d] = array('year' => $y, 'month' => $m, 'date' => $d, 'zsh' => $sh, 'zsm' => $sm, 'zeh' => $eh, 'zem' => $em, 'zrh' => $rh, 'zrm' => $rm);
+            $details[$d] = array('year' => $y, 'month' => $m, 'date' => $d, 'zsh' => $sh, 'zsm' => $sm, 'zeh' => $eh, 'zem' => $em, 'zrh' => $rh, 'zrm' => $rm, 'zjh' => $jh, 'zjm' => $jm);
           }
         }
 
