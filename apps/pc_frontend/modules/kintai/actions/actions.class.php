@@ -26,7 +26,6 @@ class kintaiActions extends sfActions
   public function executeIndex(sfWebRequest $request)
   {
     //definition
-    //testtest
     $service = self::getZendGdata();
     $Id = $this->getRequestParameter('id');
     $member_id = isset($Id) ? $Id : $this->getUser()->getMemberId();
@@ -46,16 +45,14 @@ class kintaiActions extends sfActions
     $q = new Zend_Gdata_Spreadsheets_ListQuery();
     $q->setSpreadsheetKey(opConfig::get('op_kintai_spkey', null));
     $q->setWorksheetId($wid);
-    // $q->setSingleEvents(true);
     $query = "id={$member_id} and year={$Y} and month={$M}";
     $q->setSpreadsheetQuery($query);
-    // $q->setOrderBy('created');
     $line = $service->getListFeed($q);
 
     if($line){
       $this->line = $line;
-      $this->currentMember = $this->getUser()->getmemberId();
-      $this->viewmember = $MemberS->getId();
+      $this->currentMember = $this->getUser()->getMember()->getId();
+      $this->viewmember = $member_id;
       $this->year = $Y;
       $this->month = $M;
       return sfView::SUCCESS;
@@ -377,6 +374,35 @@ class kintaiActions extends sfActions
       return $this->renderText(json_encode($arr));
     }else{
       return $this->renderText("Error: POSTリクエストで送信されなかった為、処理を中断しました。");
+    }
+  }
+
+  public function executeDownloadCSV(){
+    //definition
+    $service = self::getZendGdata();
+    $Id = $this->getRequestParameter('id');
+    $member_id = $this->getUser()->getMemberId();
+    $MemberS = Doctrine::getTable('Member')->find($member_id);
+    $this->member_name = $MemberS->getName();
+    $y = $this->getRequestParameter('year');
+    $Y = empty($y)? date("Y") : $y;
+    $m = $this->getRequestParameter('month');
+    $M = empty($m)? date("m") : $m;
+    $wid = self::getRowId();
+    //throw query
+    $q = new Zend_Gdata_Spreadsheets_ListQuery();
+    $q->setSpreadsheetKey(opConfig::get('op_kintai_spkey', null));
+    $q->setWorksheetId($wid);
+    $query = "id={$member_id} and year={$Y} and month={$M}";
+    $q->setSpreadsheetQuery($query);
+    $line = $service->getListFeed($q);
+
+    if($line){
+      $this->year = $Y;
+      $this->month = $M;
+      return sfView::SUCCESS;
+    }else{
+      return sfView::ERROR;
     }
   }
 
