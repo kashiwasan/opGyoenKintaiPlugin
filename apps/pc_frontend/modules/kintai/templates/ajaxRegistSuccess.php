@@ -56,18 +56,14 @@ $(function(){
 <div id="kintai_explain" style="display: none;">
 <h4>勤怠入力の方法</h4>
 例１）会社に<span class="op_font" style="color:#00FF00;"><span class="op_font" style="font-size:large">出社</span></span>して、<span class="op_font" style="color:#3366FF;"><span class="op_font" style="font-size:large">10:00</span></span>に出勤、<span class="op_font" style="color:#FF0000;"><span class="op_font" style="font-size:large">19:00</span></span>に退勤した場合。<br />
-<br />
-<span class="op_font" style="color:#00FF00;">出勤</span>なので、<br />
-<span class="op_font" style="font-size:large"><span class="op_font" style="color:#00FF00;">S</span><span class="op_font" style="color:#3366FF;">1000</span><span class="op_font" style="color:#FF0000;">1900</span></span><br />
+<span class="op_font" style="color:#00FF00;">出勤</span>なので、
+<span class="op_font" style="font-size:large"><span class="op_font" style="color:#00FF00;">S</span><span class="op_font" style="color:#3366FF;">1000</span><span class="op_font" style="color:#FF0000;">1900</span></span>
 と入力します。<br />
 <br />
 例２）<span class="op_font" style="color:#CC99FF;"><span class="op_font" style="font-size:large">在宅</span></span>で<span class="op_font" style="color:#3366FF;"><span class="op_font" style="font-size:large">12:00</span></span>から<span class="op_font" style="color:#FF0000;"><span class="op_font" style="font-size:large">16:00</span></span>まで働>いた場合<br /> 
-<br />
-<span class="op_font" style="color:#CC99FF;">在宅</span>なので、<br />
-<span class="op_font" style="font-size:large"><span class="op_font" style="color:#CC99FF;">Z</span><span class="op_font" style="color:#3366FF;">1200</span><span class="op_font" style="color:#FF0000;">1600</span></span><br />
+<span class="op_font" style="color:#CC99FF;">在宅</span>なので、
+<span class="op_font" style="font-size:large"><span class="op_font" style="color:#CC99FF;">Z</span><span class="op_font" style="color:#3366FF;">1200</span><span class="op_font" style="color:#FF0000;">1600</span></span>
 と入力します。<br />
-<br />
-<br />
 ・休憩時間の項目は休憩した時間（分単位）で入力してください。<br />
 ・コメントには、今日１日い行った業務を簡潔に入力してください。<br />
 <br />
