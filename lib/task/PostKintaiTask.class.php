@@ -140,7 +140,7 @@ class PostKintaiTask extends sfBaseTask
 
   private function getRowId(){
     $service = self::getZendGdata();
-    $worksheetname = "ROW";
+    $worksheetname = "RAW";
     $DocumentQuery = new Zend_Gdata_Spreadsheets_DocumentQuery();
     $DocumentQuery->setSpreadsheetKey(opConfig::get('op_kintai_spkey'));
     $SpreadsheetFeed = $service->getWorksheetFeed($DocumentQuery);
