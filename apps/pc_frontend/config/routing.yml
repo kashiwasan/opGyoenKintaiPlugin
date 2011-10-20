@@ -15,6 +15,46 @@ kintai_member:
     id: \d+
     sf_method: [get, post]
 
+kintai_member_send:
+  url:   /kintai/send2
+  class:   opDynamicAclRoute
+  param: { module: kintai, action: send2 }
+  options: { model: Member, type: object, privilege: view }
+  requirements:
+    sf_method: [post]
+
+kintai_member_ajaxRegist:
+  url:   /kintai/ajaxRegist
+  class:   opDynamicAclRoute
+  param: { module: kintai, action: ajaxRegist }
+  options: { model: Member, type: object, privilege: view }
+  requirements:
+    sf_method: [get, post]
+
+kintai_member_ajaxRegistEasy:
+  url:   /kintai/ajaxRegistEasy
+  class:   opDynamicAclRoute
+  param: { module: kintai, action: ajaxRegistEasy }
+  options: { model: Member, type: object, privilege: view }
+  requirements:
+    sf_method: [get, post]
+
+kintai_member_ajaxEdit:
+  url:   /kintai/ajaxEdit
+  class:   opDynamicAclRoute
+  param: { module: kintai, action: ajaxEdit }
+  options: { model: Member, type: object, privilege: view }
+  requirements:
+    sf_method: [get, post]
+
+kintai_member_ajaxSend:
+  url:   /kintai/ajaxSend
+  class:   opDynamicAclRoute
+  param: { module: kintai, action: ajaxSend }
+  options: { model: Member, type: object, privilege: view }
+  requirements:
+    sf_method: [get, post]
+
 kintai_default_error:
   url: /kintai/*
   param: { module: default, action: error }
