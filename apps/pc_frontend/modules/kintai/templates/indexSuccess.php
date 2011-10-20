@@ -78,20 +78,11 @@ foreach($line as $entry){
     $jitsumu = $jh.":".$jm;
     $detail[$d] = array("y" => $y, "m" => $m, "d" => $d, "keitai" => $keitai, "start" => $start, "end" => $end, "rest" => $rest, "jitsumu" => $jitsumu, "comment" => $comment);
   }
-     //$unixtime = mktime(0, 0, 0, $m, $d, $y);
-    //$nowtime = time();
-    //$pasttime = $nowtime - $unixtime;
-    //if($pasttime>259200 || $currentMember=!$viewmember){ // 259200(seconds) = 3(days) * 24(hours) * 60(minutes) * 60(seconds)
-    //  $html[] = "<tr id=\"{$i}-1\"><td id=\"{$i}-2\">{$y}/{$m}/{$d}</td><td id=\"{$i}-3\">{$keitai}</td><td id=\"{$i}-4\">{$start}</td><td id=\"{$i}-5\">{$end}</td><td id=\"{$i}-6\">{$rest}</td><td id=\"{$i}-7\">{$jitsumu}</td><td id=\"{$i}-8\">{$comment}</td><td></td></tr>";
-    //}else{
-    //  $html[] = "<tr><td>{$y}/{$m}/{$d}</td><td>{$keitai}</td><td>{$start}</td><td>{$end}</td><td>{$rest}</td><td>{$jitsumu}</td><td>{$comment}</td><td><a rel=\"prettyPopin\" href=\"./kintai/ajaxEdit?y={$y}&m={$m}&d={$d}\">編集</a></td></tr>";
-    //}
-  //$i++;
 }
     $nowday = date('d');
     $nowday = $nowday + 1;
     for($i=1;$i<$nowday;$i++){
-      if(!is_null($detail[$i])){
+      if(!is_array($detail[$i])){
         $unixtime = mktime(0, 0, 0, $detail[$i]["m"], $detail[$i]["d"], $detail[$i]["y"]);
         $nowtime = time();
         $pasttime = $nowtime - $unixtime;
