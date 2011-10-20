@@ -14,7 +14,7 @@ OpenPNE3上で勤怠管理ができるようにする。
  wget http://framework.zend.com/releases/ZendFramework-1.11.11/ZendFramework-1.11.11-minimal.zip
  unzip ZendFramework-1.11.11-minimal.zip
  rm -rf lib/vendor/Zend
- cp ZendFramework-1.11.11-minimal/library/Zend lib/vendor/
+ cp -Rv ZendFramework-1.11.11-minimal/library/Zend lib/vendor/
 
 2. Google SpreadSheetを新規作成・Spreadsheetキーを取得する。
 　【キーの取得方法】 
