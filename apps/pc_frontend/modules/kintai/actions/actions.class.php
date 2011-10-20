@@ -106,6 +106,9 @@ class kintaiActions extends sfActions
       }
       if($jitsumu<=0){
          $message.= "実務時間が0分となってしまいます。入力を見なおしてください。<br />";
+      } 
+      if(!preg_match("/^[0-9][0-9][0-9]$/", $rest)){
+         $message.= "休憩時間の入力が誤っています。";
       }
       if($keitai!="S" && $keitai!="Z"){
          $message.= "勤務種別の入力が誤っています。<br />";
@@ -301,7 +304,9 @@ class kintaiActions extends sfActions
       if($keitai!="S" && $keitai!="Z"){
          $message.= "勤務種別の入力が誤っています。<br />";
       }
-
+      if(!preg_match("/^[0-9][0-9][0-9]$/", $rest)){
+         $message.= "休憩時間の入力が誤っています。";
+      }
       if(!$comment){
          $message.= 'コメントがありません。<br />';
       }
