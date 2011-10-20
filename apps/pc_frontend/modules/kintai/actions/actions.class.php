@@ -380,7 +380,6 @@ class kintaiActions extends sfActions
   public function executeDownloadCSV(){
     //definition
     $service = self::getZendGdata();
-    $Id = $this->getRequestParameter('id');
     $member_id = $this->getUser()->getMemberId();
     $MemberS = Doctrine::getTable('Member')->find($member_id);
     $this->member_name = $MemberS->getName();
@@ -388,18 +387,20 @@ class kintaiActions extends sfActions
     $Y = empty($y)? date("Y") : $y;
     $m = $this->getRequestParameter('month');
     $M = empty($m)? date("m") : $m;
-    $wid = self::getRowId();
+    $wid = self::getMemberWorkSheetId($member_id);
     //throw query
     $q = new Zend_Gdata_Spreadsheets_ListQuery();
     $q->setSpreadsheetKey(opConfig::get('op_kintai_spkey', null));
     $q->setWorksheetId($wid);
-    $query = "id={$member_id} and year={$Y} and month={$M}";
+    $query = "year={$Y} and month={$M}";
     $q->setSpreadsheetQuery($query);
     $line = $service->getListFeed($q);
 
-    if($line){
+    if($line->entries[0]){
       $this->year = $Y;
       $this->month = $M;
+      $this->line = $line;
+      $this->setLayout(false);
       return sfView::SUCCESS;
     }else{
       return sfView::ERROR;

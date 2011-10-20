@@ -16,8 +16,8 @@ if($PreviousMonth==0){
 
 ?>
 <div id="kintai_pager" style="float: right;">
-<a href="./kintai?year=<?php echo $myear; ?>&month=<?php echo $PreviousMonth; ?>">前の月</a> | <a href="./kintai?year=<?php echo $nyear; ?>&month=<?php echo $NextMonth; ?>">次の月</a> 
-<form action="./kintai" method="GET"><input type="text" name="year" value="<?php echo $nyear; ?>" size="4" maxlength="4" / >年 <input type="text" name="month" value="<?php echo $NextMonth; ?>" size="4" maxlength="4" />月 <input type="submit" name="submit" value="移動" /></form>
+<a href="./kintai?year=<?php echo $myear; ?>&month=<?php echo $PreviousMonth; ?>&id=<?php echo $viewmember; ?>">前の月</a> | <a href="./kintai?year=<?php echo $nyear; ?>&month=<?php echo $NextMonth; ?>&id=<?php echo $viewmember; ?>">次の月</a> 
+<form action="./kintai?id=<?php echo $viewmember; ?>" method="GET"><input type="text" name="year" value="<?php echo $nyear; ?>" size="4" maxlength="4" / >年 <input type="text" name="month" value="<?php echo $NextMonth; ?>" size="4" maxlength="4" />月 <input type="submit" name="submit" value="移動" /></form>
 </div>
 <br />
 <table width="100%">
@@ -108,5 +108,19 @@ $htmls = implode("", $html);
 echo($htmls);
 ?>
 
-</table>
+</table> <br />
+<br />
+<?php
+if($currentMember == $viewmember) :
+?>
+<form action="./kintai/downloadCSV" method="POST">
+<input type="hidden" name="year" value="<?php echo $year; ?>" />
+<input type="hidden" name="month" value="<?php echo $month; ?>" />
+<input type="submit" name="submit" value="<?php echo $year; ?>年<?php echo $month; ?>月の勤怠をダウンロード(CSV)" />
+</form>
+<br />
+<?php
+endif;
+?>
+<br />
 </div>

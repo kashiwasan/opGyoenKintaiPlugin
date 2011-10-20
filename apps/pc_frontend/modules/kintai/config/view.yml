@@ -1,4 +1,11 @@
 all:
   stylesheets: ["/opGyoenKintaiPlugin/css/prettyPopin.css"]
   javascripts: ["http://ajax.aspnetcdn.com/ajax/jquery/jquery-1.5.1.min.js","/opGyoenKintaiPlugin/js/jquery.prettyPopin.js","/opGyoenKintaiPlugin/js/kintaiedit.js","/opGyoenKintaiPlugin/js/kintaiquery.js"]
+downloadCSVSuccess:
+  http_metas:
+    cache-control: public
+    pragma: public
+    content-type: application/octet-stream; name=kintai.csv
+    content-disposition: attachment; filename=kintai.csv
+  has_layout: off
 
