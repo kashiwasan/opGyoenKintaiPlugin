@@ -15,32 +15,6 @@ foreach($line as $entry){
   foreach($line_list as $line2){
     $key = $line2->getColumnName();
     switch($key){
-    /******************************
-      case "keitai":
-        $keitai = $line2->getText();
-        if($keitai=="S"){ $keitai = "出社"; }else{ $keitai = "在宅"; }
-        break;
-      case "start":
-        $start = $line2->getText();
-        if(strlen($start)==7){ $start = "0".$start; }
-        $start = mb_substr($start, "0", "5");
-        break;
-      case "end":
-        $end = $line2->getText();
-        if(strlen($end)==7){ $end = "0".$end; }
-        $end = mb_substr($end, "0", "5");
-        break;
-      case "rest":
-        $rest = $line2->getText();
-        if(strlen($rest)==7){ $rest = "0".$rest; }
-        $rest = mb_substr($rest, "0", "5");
-        break;
-      case "jitsumu":
-        $jitsumu = $line2->getText();
-        if(strlen($jitsumu)==7){ $jitsumu = "0".$jitsumu; }
-        $jitsumu = mb_substr($jitsumu, "0", "5");
-        break;
-     ********************************/
       case "rest":
         $rest = $line2->getText();
         break;
@@ -82,7 +56,7 @@ foreach($line as $entry){
     $nowday = date('d');
     $nowday = $nowday + 1;
     for($i=1;$i<$nowday;$i++){
-      if(!is_array($detail[$i])){
+      if(is_array($detail[$i])){
         $unixtime = mktime(0, 0, 0, $detail[$i]["m"], $detail[$i]["d"], $detail[$i]["y"]);
         $nowtime = time();
         $pasttime = $nowtime - $unixtime;
