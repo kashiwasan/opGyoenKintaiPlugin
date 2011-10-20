@@ -38,9 +38,9 @@ class kintaiActions extends sfActions
     }
     $this->member_name = $MemberS->getName();
     $y = $this->getRequestParameter('year');
-    $Y = is_null($y)? date("Y") : $y; 
+    $Y = empty($y)? date("Y") : $y; 
     $m = $this->getRequestParameter('month');
-    $M = is_null($m)? date("m") : $m;
+    $M = empty($m)? date("m") : $m;
     $wid = self::getRowId();
     //throw query
     $q = new Zend_Gdata_Spreadsheets_ListQuery();

@@ -1,5 +1,25 @@
 <div class="partsHeading"><h3><?php echo $member_name; ?>さんの勤怠( <?php echo $year; ?>年<?php echo $month; ?>月)</h3></div>
 <div class="block">
+<?php
+$myear = $year;
+$nyear = $year;
+$NextMonth = $month + 1;
+$PreviousMonth = $month - 1;
+if($NextMonth==13){
+  $NextMonth = 1;
+  $nyear = $year + 1;
+}
+if($PreviousMonth==0){
+  $PreviousMonth = 12;
+  $myear = $year - 1;
+}
+
+?>
+<div id="kintai_pager" style="float: right;">
+<a href="./kintai?year=<?php echo $myear; ?>&month=<?php echo $PreviousMonth; ?>">前の月</a> | <a href="./kintai?year=<?php echo $nyear; ?>&month=<?php echo $NextMonth; ?>">次の月</a> 
+<form action="./kintai" method="GET"><input type="text" name="year" value="<?php echo $nyear; ?>" size="4" maxlength="4" / >年 <input type="text" name="month" value="<?php echo $NextMonth; ?>" size="4" maxlength="4" />月 <input type="submit" name="submit" value="移動" /></form>
+</div>
+<br />
 <table width="100%">
 <tr><td width="15%">年月日</td><td width="10%">作業形態</td><td width="10%">始業時間</td><td width="10%">就業時間</td><td width="10%">休憩</td><td width="10%">実務</td><td width="25%">作業内容</td><td width="10%"></td></tr>
 
@@ -11,7 +31,7 @@ foreach($line as $entry){
   
   //echo "<tr>";
   $line_list = $entry->getCustom();
-	  $result = array();
+  $result = array();
   foreach($line_list as $line2){
     $key = $line2->getColumnName();
     switch($key){
@@ -53,9 +73,14 @@ foreach($line as $entry){
     $detail[$d] = array("y" => $y, "m" => $m, "d" => $d, "keitai" => $keitai, "start" => $start, "end" => $end, "rest" => $rest, "jitsumu" => $jitsumu, "comment" => $comment);
   }
 }
-    $nowday = date('d');
-    $nowday = $nowday + 1;
-    for($i=1;$i<$nowday;$i++){
+    if($month==4 || $month==6 || $month==9 || $month==11){
+      $maxday = 30;
+    }elseif($month==2){
+      $maxday = 29;
+    }else{
+      $maxday = 31;
+    }
+    for($i=1;$i<=$maxday;$i++){
       if(is_array($detail[$i])){
         $unixtime = mktime(0, 0, 0, $detail[$i]["m"], $detail[$i]["d"], $detail[$i]["y"]);
         $nowtime = time();
@@ -66,15 +91,13 @@ foreach($line as $entry){
           $html[]= "<tr><td>{$detail[$i]["y"]}/{$detail[$i]["m"]}/{$detail[$i]["d"]}</td><td>{$detail[$i]["keitai"]}</td><td>{$detail[$i]["start"]}</td><td>{$detail[$i]["end"]}</td><td>{$detail[$i]["rest"]}</td><td>{$detail[$i]["jitsumu"]}</td><td>{$detail[$i]["comment"]}</td><td><a rel=\"prettyPopin\" href=\"./kintai/ajaxEdit?y={$detail[$i]["y"]}&m={$detail[$i]["m"]}&d={$detail[$i]["d"]}\">編集</a></td></tr>";
         }
       }else{
-        $Y = date("Y");
-        $M = date("m");
-        $unixtime = mktime(0, 0, 0, $M, $i, $Y);
+        $unixtime = mktime(0, 0, 0, $month, $i, $year);
         $nowtime = time();
         $pasttime = $nowtime - $unixtime;
-        if($pasttime>259200){
-          $html[]= "<tr><td>{$Y}/{$M}/{$i}</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>";
+        if($pasttime>259200 || $pasttime<0){
+          $html[]= "<tr><td>{$year}/{$month}/{$i}</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>";
         }else{
-          $html[]= "<tr><td>{$Y}/{$M}/{$i}</td><td></td><td></td><td></td><td></td><td></td><td></td><td><a rel=\"prettyPopin\"href=\"./kintai/ajaxRegist?y={$Y}&m={$M}&d={$i}\">新規登録</a></td></tr>";
+          $html[]= "<tr><td>{$year}/{$month}/{$i}</td><td></td><td></td><td></td><td></td><td></td><td></td><td><a rel=\"prettyPopin\"href=\"./kintai/ajaxRegist?y={$year}&m={$month}&d={$i}\">新規登録</a></td></tr>";
         }
       }
     }
