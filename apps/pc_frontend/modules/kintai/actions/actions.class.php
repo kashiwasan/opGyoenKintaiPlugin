@@ -32,6 +32,10 @@ class kintaiActions extends sfActions
     $member_id = isset($Id) ? $Id : $this->getUser()->getMemberId();
     $MemberS = Doctrine::getTable('Member')->find($member_id);
     if(!$MemberS){ return sfView::ERROR; }
+    if ($member_id !== $this->getUser()->getMemberId()){
+      sfConfig::set('sf_nav_type', 'friend');
+      sfConfig::set('sf_nav_id', $member_id);
+    }
     $this->member_name = $MemberS->getName();
     $y = $this->getRequestParameter('year');
     $Y = is_null($y)? date("Y") : $y; 

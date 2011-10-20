@@ -1,0 +1,20 @@
+Navigation:
+  default_navigation_album:
+    type: "default"
+    uri: "@kintai_index"
+    sort_order: 38
+    Translation:
+      en:
+        caption: "deligence"
+      ja_JP:
+        caption: "勤怠"
+  friend_navigation_album:
+    type: "friend"
+    uri: "@kintai_member"
+    sort_order: 38
+    Translation:
+      en:
+        caption: "deligence"
+      ja_JP:
+        caption: "勤怠"
+

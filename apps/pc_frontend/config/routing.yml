@@ -1,0 +1,20 @@
+kintai_index:
+  url:   /kintai
+  class:   opDynamicAclRoute
+  param: { module: kintai, action: index }
+  options: { model: Member, type: object, privilege: view }
+  requirements:
+    sf_method: [get, post]
+
+kintai_member:
+  url:   /kintai/:id
+  class:   opDynamicAclRoute
+  param: { module: kintai, action: index }
+  options: { model: Member, type: object, privilege: view }
+  requirements:
+    id: \d+
+    sf_method: [get, post]
+
+kintai_default_error:
+  url: /kintai/*
+  param: { module: default, action: error }
