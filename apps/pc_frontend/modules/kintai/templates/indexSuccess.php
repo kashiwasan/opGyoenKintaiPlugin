@@ -85,7 +85,7 @@ foreach($line as $entry){
         $unixtime = mktime(0, 0, 0, $detail[$i]["m"], $detail[$i]["d"], $detail[$i]["y"]);
         $nowtime = time();
         $pasttime = $nowtime - $unixtime;
-        if($pasttime>259200 || $currentMember !== $viewmember){
+        if($pasttime>259200 || $currentUser !== $viewmember){
           $html[]= "<tr><td>{$detail[$i]["y"]}/{$detail[$i]["m"]}/{$detail[$i]["d"]}</td><td>{$detail[$i]["keitai"]}</td><td>{$detail[$i]["start"]}</td><td>{$detail[$i]["end"]}</td><td>{$detail[$i]["rest"]}</td><td>{$detail[$i]["jitsumu"]}</td><td>{$detail[$i]["comment"]}</td><td></td></tr>";
         }else{
           $html[]= "<tr><td>{$detail[$i]["y"]}/{$detail[$i]["m"]}/{$detail[$i]["d"]}</td><td>{$detail[$i]["keitai"]}</td><td>{$detail[$i]["start"]}</td><td>{$detail[$i]["end"]}</td><td>{$detail[$i]["rest"]}</td><td>{$detail[$i]["jitsumu"]}</td><td>{$detail[$i]["comment"]}</td><td><a rel=\"prettyPopin\" href=\"./kintai/ajaxEdit?y={$detail[$i]["y"]}&m={$detail[$i]["m"]}&d={$detail[$i]["d"]}\">編集</a></td></tr>";
@@ -94,7 +94,7 @@ foreach($line as $entry){
         $unixtime = mktime(0, 0, 0, $month, $i, $year);
         $nowtime = time();
         $pasttime = $nowtime - $unixtime;
-        if($pasttime>259200 || $pasttime<0 || $currentMember !== $viewmember){
+        if($pasttime>259200 || $pasttime<0 || $currentUser !== $viewmember){
           $html[]= "<tr><td>{$year}/{$month}/{$i}</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>";
         }else{
           $html[]= "<tr><td>{$year}/{$month}/{$i}</td><td></td><td></td><td></td><td></td><td></td><td></td><td><a rel=\"prettyPopin\"href=\"./kintai/ajaxRegist?y={$year}&m={$month}&d={$i}\">新規登録</a></td></tr>";
