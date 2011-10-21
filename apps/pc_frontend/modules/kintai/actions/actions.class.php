@@ -153,14 +153,14 @@ class kintaiActions extends sfActions
         $ymdhis = date('Y/m/d H:i:s');
 
         $rowData = array(
-          'id' => $memberId,
-          'year' => $y,
-          'month' => $m,
-          'date' => $d,
-          'rest' => $rest,
-          'data' => $data,
+          'id'      => $memberId,
+          'year'    => $y,
+          'month'   => $m,
+          'date'    => $d,
+          'rest'    => $rest,
+          'data'    => $data,
           'comment' => $comment,
-          );
+        );
         $arr = array();
         $spdata = $service->insertRow($rowData, opConfig::get('op_kintai_spkey', null), $wid);
         if($spdata){
@@ -360,12 +360,12 @@ class kintaiActions extends sfActions
         $j['r'] = $j['hour'].':' .$j['minute'];
         $ymdhis = date('Y/m/d H:i:s');
         $rowData = array(
-          'id' => $memberId,
-          'year' => $y,
-          'month' => $m,
-          'date' => $d,
-          'rest' => $rest,
-          'data' => $data,
+          'id'      => $memberId,
+          'year'    => $y,
+          'month'   => $m,
+          'date'    => $d,
+          'rest'    => $rest,
+          'data'    => $data,
           'comment' => $comment,
         );
         $arr = array();
@@ -522,12 +522,12 @@ class kintaiActions extends sfActions
         $j['r'] = $j['hour'].':' .$j['minute'];
         $ymdhis = date('Y/m/d H:i:s');
         $rowData = array(
-          'id' => $memberId,
-          'year' => $y,
-          'month' => $m,
-          'date' => $d,
-          'rest' => $rest,
-          'data' => $data,
+          'id'      => $memberId,
+          'year'    => $y,
+          'month'   => $m,
+          'date'    => $d,
+          'rest'    => $rest,
+          'data'    => $data,
           'comment' => $comment,
         );
         $arr = array();

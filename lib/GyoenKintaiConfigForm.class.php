@@ -2,17 +2,17 @@
 class GyoenKintaiConfigForm extends sfForm
 {
   protected $configs = array(
-    'spsheet_id' => 'op_kintai_spid',
-    'spsheet_pw' => 'op_kintai_sppw',
+    'spsheet_id'  => 'op_kintai_spid',
+    'spsheet_pw'  => 'op_kintai_sppw',
     'spsheet_key' => 'op_kintai_spkey',
   );
 
   public function configure()
   {
     $this->setWidgets(array(
-      'spsheet_id'   => new sfWidgetFormInputText(),
-      'spsheet_pw'   => new sfWidgetFormInputPassword(),
-      'spsheet_key'   => new sfWidgetFormInputText(),
+      'spsheet_id'  => new sfWidgetFormInputText(),
+      'spsheet_pw'  => new sfWidgetFormInputPassword(),
+      'spsheet_key' => new sfWidgetFormInputText(),
     ));
 
     foreach($this->configs as $k => $v)
@@ -25,8 +25,8 @@ class GyoenKintaiConfigForm extends sfForm
     }
 
     $this->setValidators(array(
-      'spsheet_id' => new sfValidatorString(array('max_length' => 60)),
-      'spsheet_pw' => new sfValidatorString(array('max_length' => 40)),
+      'spsheet_id'  => new sfValidatorString(array('max_length' => 60)),
+      'spsheet_pw'  => new sfValidatorString(array('max_length' => 40)),
       'spsheet_key' => new sfValidatorString(array('max_length' => 100)),
     ));
 
