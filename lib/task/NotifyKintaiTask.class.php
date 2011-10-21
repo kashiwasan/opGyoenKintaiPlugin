@@ -1,5 +1,6 @@
 <?php
-class NotifyKintaiTask extends sfBaseTask {
+class NotifyKintaiTask extends sfBaseTask
+{
   protected function configure() {
     mb_language('Japanese');
     mb_internal_encoding('utf-8');
