@@ -21,10 +21,12 @@ class PostKintaiTask extends sfBaseTask
     $nowday = date('d');
     $service = self::getZendGdata();
     $members = Doctrine::getTable('Member')->findAll();
-    foreach($members as $member){
+    foreach ($members as $member)
+    {
       $memberId = $member->getId();
       $memberConfig = self::getMemberWorkSheetId($memberId);
-      if($memberConfig){
+      if ($memberConfig)
+      {
         $config = $memberConfig;
         $wid = self::getRowId();
         $q = new Zend_Gdata_Spreadsheets_ListQuery();
@@ -33,11 +35,14 @@ class PostKintaiTask extends sfBaseTask
         $query = 'id='.$memberId.' and year='.$y.' and month='.$m;
         $q->setSpreadsheetQuery($query);
         $lineList = $service->getListFeed($q);
-        foreach($lineList as $entry){
+        foreach ($lineList as $entry)
+        {
           $line = $entry->getCustom();
-          foreach($line as $list){
+          foreach ($line as $list)
+          {
             $key = $list->getColumnName();
-            switch($key){
+            switch ($key)
+            {
               case 'year':
                 $y = $list->getText();
                 break;
@@ -59,7 +64,7 @@ class PostKintaiTask extends sfBaseTask
             }
           }
           $keitai = substr($data, 0, 1);
-          // if($keitai=='S'){ $keitai = '出社'; }else{ $keitai = '在宅'; }
+          // if ($keitai=='S'){ $keitai = '出社'; }else{ $keitai = '在宅'; }
           $sh = substr($data, 1, 2);
           $sm = substr($data, 3, 2);
           $eh = substr($data, 5, 2);
@@ -71,39 +76,64 @@ class PostKintaiTask extends sfBaseTask
           $jitsumu = $endtime - $starttime - $rest;
           $jh = floor($jitsumu / 60);
           $jm = $jitsumu - $jh * 60;
-          if(strlen($jh)==1){ $jh = '0'.$jh; }
-          if(strlen($jm)==1){ $jm = '0'.$jm; }
-          if($rh==0){ $rh = '0'; }
-          if($rm==0){ $rm = '0'; }
-          if($keitai=='S'){
+          if (strlen($jh)==1)
+          {
+            $jh = '0'.$jh;
+          }
+          if (strlen($jm)==1)
+          {
+            $jm = '0'.$jm;
+          }
+          if ($rh==0)
+          {
+            $rh = '0';
+          }
+          if ($rm==0)
+          {
+            $rm = '0';
+          }
+          if ($keitai=='S')
+          {
             $details[$d] = array('year' => $y, 'month' => $m, 'date' => $d, 'ssh' => $sh, 'ssm' => $sm, 'seh' => $eh, 'sem' => $em, 'srh' => $rh, 'srm' => $rm, 'sjh' => $jh, 'sjm' => $jm);
           }
-          if($keitai=='Z'){
+          if ($keitai=='Z')
+          {
             $details[$d] = array('year' => $y, 'month' => $m, 'date' => $d, 'zsh' => $sh, 'zsm' => $sm, 'zeh' => $eh, 'zem' => $em, 'zrh' => $rh, 'zrm' => $rm, 'zjh' => $jh, 'zjm' => $jm);
           }
         }
 
         $month = date('m');
-        if($m==1 || $m==3 || $m==5 || $m==7 || $m==8 || $m==10 || $m==12){
+        if ($m==1 || $m==3 || $m==5 || $m==7 || $m==8 || $m==10 || $m==12)
+        {
           $maxday = 31;
-        }elseif($m==2){
-          if(($year %4 == 0 && $year %100 != 0) || $year %400 == 0){
+        }
+        elseif ($m==2)
+        {
+          if (($year %4 == 0 && $year %100 != 0) || $year %400 == 0)
+          {
             $maxday = 29;
-          }else{
+          }
+          else
+          {
             $maxday = 28;
           }
-        }else{
+        }
+        else
+        {
           $maxday = 30;
         }
 
-        for($i=1;$i<=$maxday;$i++){
-          if(is_null($details[$i])){
+        for ($i=1;$i<=$maxday;$i++)
+        {
+          if (is_null($details[$i]))
+          {
             unset($details[$i]);
             $details[$i] = array('year' => $y, 'month' => $m, 'date' => $i);
           }  
         }
         // var_dump($details);
-        foreach($details as $detail){
+        foreach ($details as $detail)
+        {
           $s = new Zend_Gdata_Spreadsheets_ListQuery();
           $s->setSpreadsheetkey(opConfig::get('op_kintai_spkey'));
           $s->setWorkSheetId($config);
@@ -111,7 +141,10 @@ class PostKintaiTask extends sfBaseTask
           $s->setSpreadsheetQuery($query);
           $lineList = $service->getListFeed($s);
           $update = $service->updateRow($lineList->entries['0'], $detail);
-          if($update){ echo 'Success! member-id : '.$memberId.'  date: '.$detail['year'].'/'.$detail['month'].'/'.$detail['date']."\n"; }
+          if ($update)
+          {
+            echo 'Success! member-id : '.$memberId.'  date: '.$detail['year'].'/'.$detail['month'].'/'.$detail['date']."\n";
+          }
         }
         unset($details);
         $lineList = null;
@@ -142,9 +175,11 @@ class PostKintaiTask extends sfBaseTask
     $documentQuery->setSpreadsheetKey(opConfig::get('op_kintai_spkey'));
     $spreadsheetFeed = $service->getWorksheetFeed($documentQuery);
     $i = 0;
-    foreach($spreadsheetFeed->entries as $worksheetEntry) {
+    foreach ($spreadsheetFeed->entries as $worksheetEntry)
+    {
       $worksheetIdText = split('/', $spreadsheetFeed->entries[$i]->id->text);
-      if($worksheetEntry->title->text===$worksheetname){
+      if ($worksheetEntry->title->text===$worksheetname)
+      {
         $worksheetId = $worksheetIdText[8];
         break;
       }
@@ -162,9 +197,11 @@ class PostKintaiTask extends sfBaseTask
     $documentQuery->setSpreadsheetKey(opConfig::get('op_kintai_spkey'));
     $spreadsheetFeed = $service->getWorksheetFeed($documentQuery);
     $i = 0;
-    foreach($spreadsheetFeed->entries as $worksheetEntry) {
+    foreach ($spreadsheetFeed->entries as $worksheetEntry)
+    {
       $worksheetIdText = split('/', $spreadsheetFeed->entries[$i]->id->text);
-      if($worksheetEntry->title->text===$worksheetname){
+      if ($worksheetEntry->title->text===$worksheetname)
+      {
         $worksheetId = $worksheetIdText[8];
         break;
       }

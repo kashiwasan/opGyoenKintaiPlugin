@@ -15,10 +15,10 @@ class GyoenKintaiConfigForm extends sfForm
       'spsheet_key' => new sfWidgetFormInputText(),
     ));
 
-    foreach($this->configs as $k => $v)
+    foreach ($this->configs as $k => $v)
     {
       $config = Doctrine::getTable('SnsConfig')->retrieveByName($v);
-      if($config) 
+      if ($config)
       {
         $this->getWidgetSchema()->setDefault($k, $config->getValue());
       }    

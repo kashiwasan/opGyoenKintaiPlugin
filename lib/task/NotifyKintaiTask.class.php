@@ -17,16 +17,24 @@ class NotifyKintaiTask extends sfBaseTask
   {
     $databaseManager = new sfDatabaseManager($this->configuration);
     $url = sfConfig::get('op_base_url');
-    if($arguments['mode']=='morning'){
+    if ($arguments['mode']=='morning')
+    {
       $message = 'おはようございます。昨日の勤怠報告が済んでいない方は報告よろしくお願いします。';
-    }elseif($arguments['mode']=='afternoon'){
+    }
+    elseif ($arguments['mode']=='afternoon')
+    {
       $message = 'お疲れ様です。退勤される方は勤怠報告をよろしくおねがいします。';
-    }elseif($arguments['mode']=='evening'){
+    }
+    elseif ($arguments['mode']=='evening')
+    {
       $message = 'お疲れ様です。退勤される方は勤怠報告をよろしくおねがいします。';
-    }else{
+    }
+    else
+    {
       $message = '';
     }
-    if($message){
+    if ($message)
+    {
       $message = $message.' '.$url.'/kintai';
       $activity = new ActivityData();
       $activity->setMemberId(1);
@@ -34,7 +42,9 @@ class NotifyKintaiTask extends sfBaseTask
       $activity->setIsMobile(0);
       $activity->save();
       echo "Posted via Acvitity.\n";
-    }else{
+    }
+    else
+    {
       echo "Posted failure. Maybe incorrect arguments.\n";
     }
   }
