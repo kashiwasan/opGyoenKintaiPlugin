@@ -37,28 +37,28 @@ class PostKintaiTask extends sfBaseTask
           foreach($line as $list){
             $key = $list->getColumnName();
             switch($key){
-              case "year":
+              case 'year':
                 $y = $list->getText();
                 break;
-              case "month": 
+              case 'month': 
                 $m = $list->getText();
                 break;
-              case "date":
+              case 'date':
                 $d = "{$list->getText()}";
                 break;
-              case "data":
+              case 'data':
                 $data = $list->getText();
                 break;
-              case "rest":
+              case 'rest':
                 $rest = $list->getText();
                 break;
-              case "comment":
+              case 'comment':
                 $comment = $list->getText();
                 break;
             }
           }
           $keitai = substr($data, 0, 1);
-          // if($keitai=="S"){ $keitai = "出社"; }else{ $keitai = "在宅"; }
+          // if($keitai=='S'){ $keitai = '出社'; }else{ $keitai = '在宅'; }
           $sh = substr($data, 1, 2);
           $sm = substr($data, 3, 2);
           $eh = substr($data, 5, 2);
@@ -70,14 +70,14 @@ class PostKintaiTask extends sfBaseTask
           $jitsumu = $endtime - $starttime - $rest;
           $jh = floor($jitsumu / 60);
           $jm = $jitsumu - $jh * 60;
-          if(strlen($jh)==1){ $jh = "0".$jh; }
-          if(strlen($jm)==1){ $jm = "0".$jm; }
-          if($rh==0){ $rh = "0"; }
-          if($rm==0){ $rm = "0"; }
-          if($keitai=="S"){
+          if(strlen($jh)==1){ $jh = '0'.$jh; }
+          if(strlen($jm)==1){ $jm = '0'.$jm; }
+          if($rh==0){ $rh = '0'; }
+          if($rm==0){ $rm = '0'; }
+          if($keitai=='S'){
             $details[$d] = array('year' => $y, 'month' => $m, 'date' => $d, 'ssh' => $sh, 'ssm' => $sm, 'seh' => $eh, 'sem' => $em, 'srh' => $rh, 'srm' => $rm, 'sjh' => $jh, 'sjm' => $jm);
           }
-          if($keitai=="Z"){
+          if($keitai=='Z'){
             $details[$d] = array('year' => $y, 'month' => $m, 'date' => $d, 'zsh' => $sh, 'zsm' => $sm, 'zeh' => $eh, 'zem' => $em, 'zrh' => $rh, 'zrm' => $rm, 'zjh' => $jh, 'zjm' => $jm);
           }
         }
@@ -132,7 +132,7 @@ class PostKintaiTask extends sfBaseTask
     $service = self::getZendGdata();
     $member = Doctrine::getTable('Member')->find($memberId);
     $memberEmailAddress = $member->getEmailAddress(false);
-    $memberEmailAddressUserName  = explode("@", $memberEmailAddress);
+    $memberEmailAddressUserName  = explode('@', $memberEmailAddress);
     $worksheetname = $memberEmailAddressUserName[0];
     $documentQuery = new Zend_Gdata_Spreadsheets_DocumentQuery();
     $documentQuery->setSpreadsheetKey(opConfig::get('op_kintai_spkey'));
@@ -151,7 +151,7 @@ class PostKintaiTask extends sfBaseTask
 
   private function getRowId(){
     $service = self::getZendGdata();
-    $worksheetname = "RAW";
+    $worksheetname = 'RAW';
     $documentQuery = new Zend_Gdata_Spreadsheets_DocumentQuery();
     $documentQuery->setSpreadsheetKey(opConfig::get('op_kintai_spkey'));
     $spreadsheetFeed = $service->getWorksheetFeed($documentQuery);

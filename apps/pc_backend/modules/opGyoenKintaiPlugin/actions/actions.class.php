@@ -84,7 +84,7 @@ class opGyoenKintaiPluginActions extends sfActions
           }
           $config->setValue($wid);
           $config->save();
-          $this->message = "登録しました。";
+          $this->message = '登録しました。';
           $this->member = $member;
           $this->value = $wid;
           return sfView::SUCCESS;
@@ -109,7 +109,7 @@ class opGyoenKintaiPluginActions extends sfActions
       if($config){
         $this->value= $config->getValue();
       }else{
-        $this->value = "";
+        $this->value = '';
       }
       return sfView::SUCCESS;
     }
