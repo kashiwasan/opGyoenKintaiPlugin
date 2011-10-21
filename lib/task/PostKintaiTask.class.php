@@ -31,8 +31,8 @@ class PostKintaiTask extends sfBaseTask
         $q->setWorkSheetId($wid);
         $query = "id={$memberId} and year={$y} and month={$m}";
         $q->setSpreadsheetQuery($query);
-        $line_list = $service->getListFeed($q);
-        foreach($line_list as $entry){
+        $lineList = $service->getListFeed($q);
+        foreach($lineList as $entry){
           $line = $entry->getCustom();
           foreach($line as $list){
             $key = $list->getColumnName();
@@ -113,7 +113,7 @@ class PostKintaiTask extends sfBaseTask
           if($update){ echo "Success! member-id : {$memberId}  date: {$detail['year']}/{$detail['month']}/{$detail['date']}\n"; }
         }
         unset($details);
-        $line_list = null;
+        $lineList = null;
         $line = null;
         // var_dump($details);
       }

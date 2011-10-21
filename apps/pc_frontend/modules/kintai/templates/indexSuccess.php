@@ -1,4 +1,4 @@
-<div class="partsHeading"><h3><?php echo $member_name; ?>さんの勤怠( <?php echo $year; ?>年<?php echo $month; ?>月)</h3></div>
+<div class="partsHeading"><h3><?php echo $memberName; ?>さんの勤怠( <?php echo $year; ?>年<?php echo $month; ?>月)</h3></div>
 <div class="block">
 <?php
 $myear = $year;
@@ -30,9 +30,9 @@ $detail = array();
 foreach($line as $entry){
   
   //echo "<tr>";
-  $line_list = $entry->getCustom();
+  $lineList = $entry->getCustom();
   $result = array();
-  foreach($line_list as $line2){
+  foreach($lineList as $line2){
     $key = $line2->getColumnName();
     switch($key){
       case "rest":

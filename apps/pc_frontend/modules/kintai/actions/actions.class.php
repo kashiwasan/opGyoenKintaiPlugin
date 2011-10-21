@@ -28,14 +28,14 @@ class kintaiActions extends sfActions
     //definition
     $service = self::getZendGdata();
     $Id = $this->getRequestParameter('id');
-    $member_id = isset($Id) ? $Id : $this->getUser()->getMemberId();
-    $MemberS = Doctrine::getTable('Member')->find($member_id);
+    $memberId = isset($Id) ? $Id : $this->getUser()->getMemberId();
+    $MemberS = Doctrine::getTable('Member')->find($memberId);
     if(!$MemberS){ return sfView::ERROR; }
-    if ($member_id !== $this->getUser()->getMemberId()){
+    if ($memberId !== $this->getUser()->getMemberId()){
       sfConfig::set('sf_nav_type', 'friend');
-      sfConfig::set('sf_nav_id', $member_id);
+      sfConfig::set('sf_nav_id', $memberId);
     }
-    $this->member_name = $MemberS->getName();
+    $this->memberName = $MemberS->getName();
     $y = $this->getRequestParameter('year');
     $Y = empty($y)? date("Y") : $y; 
     $m = $this->getRequestParameter('month');
@@ -45,14 +45,14 @@ class kintaiActions extends sfActions
     $q = new Zend_Gdata_Spreadsheets_ListQuery();
     $q->setSpreadsheetKey(opConfig::get('op_kintai_spkey', null));
     $q->setWorksheetId($wid);
-    $query = "id={$member_id} and year={$Y} and month={$M}";
+    $query = "id={$memberId} and year={$Y} and month={$M}";
     $q->setSpreadsheetQuery($query);
     $line = $service->getListFeed($q);
 
     if($line){
       $this->line = $line;
       $this->currentMember = $this->getUser()->getMember()->getId();
-      $this->viewmember = $member_id;
+      $this->viewmember = $memberId;
       $this->year = $Y;
       $this->month = $M;
       return sfView::SUCCESS;
@@ -215,7 +215,7 @@ class kintaiActions extends sfActions
 
   public function executeAjaxEdit(sfWebRequest $request){
     $memberId = $this->getUser()->getMemberId();
-    $member_name = $this->getUser()->getMember()->getName();
+    $memberName = $this->getUser()->getMember()->getName();
     $y = $request->getParameter('y');
     $m = $request->getParameter('m');
     $d = $request->getParameter('d');
@@ -233,8 +233,8 @@ class kintaiActions extends sfActions
       return $this->renderText("この日の勤怠は存在しないか、既に編集不可能です。");
     }else{
       foreach($listFeed->entries as $entry){
-        $line_list = $entry->getCustom();
-        foreach($line_list as $line){
+        $lineList = $entry->getCustom();
+        foreach($lineList as $line){
           $key = $line->getColumnName();
           switch($key){
             case "data":
@@ -245,7 +245,7 @@ class kintaiActions extends sfActions
               $comment = $line->getText();
           }
         }
-        $this->nickname = $member_name;
+        $this->nickname = $memberName;
         $this->y = $y;
         $this->m = $m;
         $this->d = $d;
@@ -385,14 +385,14 @@ class kintaiActions extends sfActions
   public function executeDownloadCSV(sfWebRequesr $request){
     //definition
     $service = self::getZendGdata();
-    $member_id = $this->getUser()->getMemberId();
-    $MemberS = Doctrine::getTable('Member')->find($member_id);
-    $this->member_name = $MemberS->getName();
+    $memberId = $this->getUser()->getMemberId();
+    $MemberS = Doctrine::getTable('Member')->find($memberId);
+    $this->memberName = $MemberS->getName();
     $y = $this->getRequestParameter('year');
     $Y = empty($y)? date("Y") : $y;
     $m = $this->getRequestParameter('month');
     $M = empty($m)? date("m") : $m;
-    $wid = self::getMemberWorkSheetId($member_id);
+    $wid = self::getMemberWorkSheetId($memberId);
     //throw query
     $q = new Zend_Gdata_Spreadsheets_ListQuery();
     $q->setSpreadsheetKey(opConfig::get('op_kintai_spkey', null));

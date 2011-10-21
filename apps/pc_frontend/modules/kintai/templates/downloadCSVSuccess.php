@@ -2,13 +2,13 @@
 
 $detail = array();
 
-$detail[0] = "{$member_id},名前：{$member_name},,勤怠表,,{$year},年,{$month},月,,,,,,,,,,,,\n年,月,日,(出社),始業,時間,終業,時間,休憩,時間,実務,時間,(在宅),始業,時間,終業,時間,休憩,時間,実務,時間";
+$detail[0] = "{$memberId},名前：{$memberName},,勤怠表,,{$year},年,{$month},月,,,,,,,,,,,,\n年,月,日,(出社),始業,時間,終業,時間,休憩,時間,実務,時間,(在宅),始業,時間,終業,時間,休憩,時間,実務,時間";
 
 foreach($line as $entry){
   //echo "<tr>";
-  $line_list = $entry->getCustom();
+  $lineList = $entry->getCustom();
   $result = array();
-  foreach($line_list as $line2){
+  foreach($lineList as $line2){
     $key = $line2->getColumnName();
     switch($key){
       case "year":
