@@ -76,7 +76,12 @@ foreach($line as $entry){
     if($month==4 || $month==6 || $month==9 || $month==11){
       $maxday = 30;
     }elseif($month==2){
-      $maxday = 29;
+      if(($year %4 == 0 && $year %100 != 0) || $year %400 == 0 ){
+        $maxday = 29;
+      }else{
+        $maxday = 28;
+      }
+
     }else{
       $maxday = 31;
     }

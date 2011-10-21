@@ -107,7 +107,7 @@ class kintaiActions extends sfActions
       if($jitsumu<=0){
          $message.= "実務時間が0分となってしまいます。入力を見なおしてください。<br />";
       } 
-      if(!preg_match("/^[0-9][0-9][0-9]$/", $rest)){
+      if(!preg_match("/^\d{2,3}$/", $rest)){
          $message.= "休憩時間の入力が誤っています。";
       }
       if($keitai!="S" && $keitai!="Z"){
@@ -304,7 +304,7 @@ class kintaiActions extends sfActions
       if($keitai!="S" && $keitai!="Z"){
          $message.= "勤務種別の入力が誤っています。<br />";
       }
-      if(!preg_match("/^[0-9][0-9][0-9]$/", $rest)){
+      if(!preg_match("/^\d{2,3}$/", $rest)){
          $message.= "休憩時間の入力が誤っています。";
       }
       if(!$comment){
@@ -382,7 +382,7 @@ class kintaiActions extends sfActions
     }
   }
 
-  public function executeDownloadCSV(){
+  public function executeDownloadCSV(sfWebRequesr $request){
     //definition
     $service = self::getZendGdata();
     $member_id = $this->getUser()->getMemberId();
@@ -409,6 +409,138 @@ class kintaiActions extends sfActions
       return sfView::SUCCESS;
     }else{
       return sfView::ERROR;
+    }
+  }
+
+  public function executeAjaxTextInput(sfWebRequest $request){
+    $this->setLayout(false);
+    return sfView::SUCCESS;
+  }
+
+  public function executeAjaxTextSend(sfWebRequest $request){
+
+    $service = self::getZendGdata();
+    $wid = self::getRowId();
+    if($request->isMethod(sfWebRequest::POST)){
+      $data = $request->getParameter('textdata');
+      $memberId = $this->getUser()->getMemberId();
+      $data = explode("\n", $data);
+      foreach($data as $text){
+        
+        //example 20111020 S10001900
+        $year[] = substr($text, 0, 4);
+        $month[] = substr($text, 3, 2);
+        $date[] = substr($text, 5, 2);
+        $keitai[] = substr($data, 6, 1);
+        $sh[] = substr($data, 7, 2);
+        $sm[] = substr($data, 9, 2);
+        $eh[] = substr($data, 11, 2);
+        $em[] = substr($data, 13, 2);
+        $rest[] = substr($data, 15, 3);
+      }
+      $keitai = substr($data, 0, 1);
+      $start = array();
+      $end = array();
+      $start["hour"]= substr($data, 1, 2);
+      $start["minute"] = substr($data, 3, 2);
+      $end["hour"] = substr($data, 5, 2);
+      $end["minute"] = substr($data, 7, 2);
+      $start["time"] = $start["hour"] * 60 + $start["minute"];
+      $end["time"] = $end["hour"] * 60 + $end["minute"];
+      $jitsumu = $end["time"] - $start["time"] - $rest;
+      $message = null;
+
+      //Validation
+      if(!strlen($data)==9){
+         $message.= "入力が不正です<br />";
+      }
+      if(!preg_match("/^[0-2][0-9]$/", $start["hour"]) || !preg_match("/^[0-5][0-9]$/", $start["minute"])){
+         $message.= "始業時間の入力が誤っています。<br />";
+      }
+      if(!preg_match("/^[0-2][0-9]$/", $end["hour"]) || !preg_match("/^[0-5][0-9]$/", $end["minute"])){
+         $message.= "終業時間の入力が誤っています。<br />";
+      }
+      if($jitsumu<=0){
+         $message.= "実務時間が0分となってしまいます。入力を見なおしてください。<br />";
+      }
+      if($keitai!="S" && $keitai!="Z"){
+         $message.= "勤務種別の入力が誤っています。<br />";
+      }
+      if(!preg_match("/^[0-9][0-9][0-9]$/", $rest)){
+         $message.= "休憩時間の入力が誤っています。";
+      }
+      if(!$comment){
+         $message.= 'コメントがありません。<br />';
+      }
+      
+     $q = new Zend_Gdata_Spreadsheets_ListQuery();
+     $q->setSpreadsheetKey(opConfig::get('op_kintai_spkey', null));
+     $q->setWorksheetId($wid);
+     $query = "id={$memberId} and year={$y} and month={$m} and date={$d}";
+     $q->setSpreadsheetQuery($query);
+     $line = $service->getListFeed($q);
+
+     if(!$line->entries["0"]){
+       $message.= '編集しようとした勤怠は存在しませんでした。';
+     }else{
+       $lineList = $line->entries["0"]->getCustom();
+       foreach($lineList as $rows){
+         $key = $rows->getColumnName();
+         switch($key){
+           case "year":
+             $y = $rows->getText();
+             break;
+           case "month":
+             $m = $rows->getText();
+             break;
+           case "date":
+             $d = $rows->getText();
+             break;
+         }
+         $nowtime = time();
+         $unixtime = mktime(0, 0, 0, $m, $d, $y);
+         $pasttime = $nowtime - $unixtime;
+         if($pasttime > 259200){   // 259200 = 3 * 24 * 60 * 60
+           $message.= "この勤怠はすでに編集不可となっています。";
+         }
+       }
+     }
+
+     if($message)
+      {
+        $arr = array('status' => 'err', 'msg' => $message);
+      }else{
+        $start["r"] = $start["hour"].":".$start["minute"];
+        $end["r"] = $end["hour"].":".$end["minute"];
+        $r = array();
+        $j = array();
+        $r["hour"] = floor($rest / 60);
+        $r["minute"] = $rest - ( $r["hour"] * 60 );
+        $r["r"] = $r["hour"].":".$r["minute"];
+        $j["hour"] = floor($jitsumu / 60);
+        $j["minute"] = $jitsumu - ( $j["hour"] * 60 );
+        $j["r"] = $j["hour"].":" .$j["minute"];
+        $ymdhis = date("Y/m/d H:i:s");
+        $rowData = array(
+          'id' => $memberId,
+          'year' => $y,
+          'month' => $m,
+          'date' => $d,
+          'rest' => $rest,
+          'data' => $data,
+          'comment' => $comment,
+        );
+        $arr = array();
+        $spdata = $service->updateRow($line->entries['0'], $rowData);
+        if($spdata){
+          $arr = array('status' => 'ok', 'msg' => '勤怠を編集しました。');
+        }else{
+          $arr = array('status' => 'err2', 'msg' => '通信エラーです。（スプレッドシートサーバーと通信ができませんでした。）');
+        }
+      }
+      return $this->renderText(json_encode($arr));
+    }else{
+      return $this->renderText("Error: POSTリクエストで送信されなかった為、処理を中断しました。");
     }
   }
 
