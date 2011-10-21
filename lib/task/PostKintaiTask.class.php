@@ -29,7 +29,7 @@ class PostKintaiTask extends sfBaseTask
         $q = new Zend_Gdata_Spreadsheets_ListQuery();
         $q->setSpreadsheetkey(opConfig::get('op_kintai_spkey'));
         $q->setWorkSheetId($wid);
-        $query = "id={$memberId} and year={$y} and month={$m}";
+        $query = 'id='.$memberId.' and year='.$y.' and month='.$m;
         $q->setSpreadsheetQuery($query);
         $lineList = $service->getListFeed($q);
         foreach($lineList as $entry){
@@ -44,7 +44,7 @@ class PostKintaiTask extends sfBaseTask
                 $m = $list->getText();
                 break;
               case 'date':
-                $d = "{$list->getText()}";
+                $d = (string)$list->getText();
                 break;
               case 'data':
                 $data = $list->getText();
@@ -106,11 +106,11 @@ class PostKintaiTask extends sfBaseTask
           $s = new Zend_Gdata_Spreadsheets_ListQuery();
           $s->setSpreadsheetkey(opConfig::get('op_kintai_spkey'));
           $s->setWorkSheetId($config);
-          $query = "year={$detail['year']} and month={$detail['month']} and date={$detail['date']}";
+          $query = 'year='.$detail['year'].' and month='.$detail['month'].' and date='.$detail['date'];
           $s->setSpreadsheetQuery($query);
           $lineList = $service->getListFeed($s);
           $update = $service->updateRow($lineList->entries['0'], $detail);
-          if($update){ echo "Success! member-id : {$memberId}  date: {$detail['year']}/{$detail['month']}/{$detail['date']}\n"; }
+          if($update){ echo 'Success! member-id : '.$memberId.'  date: '.$detail['year'].'/'.$detail['month'].'/'.$detail['date']."\n"; }
         }
         unset($details);
         $lineList = null;

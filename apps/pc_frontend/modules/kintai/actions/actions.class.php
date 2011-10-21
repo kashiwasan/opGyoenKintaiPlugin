@@ -45,7 +45,7 @@ class kintaiActions extends sfActions
     $q = new Zend_Gdata_Spreadsheets_ListQuery();
     $q->setSpreadsheetKey(opConfig::get('op_kintai_spkey', null));
     $q->setWorksheetId($wid);
-    $query = "id={$memberId} and year={$year} and month={$month}";
+    $query = 'id='.$memberId.' and year='.$year.' and month='.$month;
     $q->setSpreadsheetQuery($query);
     $line = $service->getListFeed($q);
 
@@ -128,7 +128,7 @@ class kintaiActions extends sfActions
       $q = new Zend_Gdata_Spreadsheets_ListQuery();
       $q->setSpreadsheetKey(opConfig::get('op_kintai_spkey', null));
       $q->setWorksheetId($wid);
-      $query = "id={$memberId} and year={$y} and month={$m} and date={$d}";
+      $query = 'id='.$memberId.' and year='.$y.' and month='.$m.' and date='.$d;
       $q->setSpreadsheetQuery($query);
       $line = $service->getListFeed($q);
 
@@ -225,7 +225,7 @@ class kintaiActions extends sfActions
     $q->setSpreadsheetKey(opConfig::get('op_kintai_spkey', null));
     $q->setWorksheetId($wid);
     // $q->setSingleEvents(true);
-    $query = "id={$memberId} and year={$y} and month={$m} and date={$d}";
+    $query = 'id='.$memberId.' and year='.$y.' and month='.$m.' and date='.$d;
     $q->setSpreadsheetQuery($query);
 
     $listFeed = $service->getListFeed($q);
@@ -314,7 +314,7 @@ class kintaiActions extends sfActions
       $q = new Zend_Gdata_Spreadsheets_ListQuery();
       $q->setSpreadsheetKey(opConfig::get('op_kintai_spkey', null));
       $q->setWorksheetId($wid);
-      $query = "id={$memberId} and year={$y} and month={$m} and date={$d}";
+      $query = 'id='.$memberId.' and year='.$y.' and month='.$m.' and date='.$d;
       $q->setSpreadsheetQuery($query);
       $line = $service->getListFeed($q);
 
@@ -397,7 +397,7 @@ class kintaiActions extends sfActions
     $q = new Zend_Gdata_Spreadsheets_ListQuery();
     $q->setSpreadsheetKey(opConfig::get('op_kintai_spkey', null));
     $q->setWorksheetId($wid);
-    $query = "year={$year} and month={$month}";
+    $query = 'year='.$year.' and month='.$month;
     $q->setSpreadsheetQuery($query);
     $line = $service->getListFeed($q);
 
@@ -476,7 +476,7 @@ class kintaiActions extends sfActions
       $q = new Zend_Gdata_Spreadsheets_ListQuery();
       $q->setSpreadsheetKey(opConfig::get('op_kintai_spkey', null));
       $q->setWorksheetId($wid);
-      $query = "id={$memberId} and year={$y} and month={$m} and date={$d}";
+      $query = 'id='.$memberId.' and year='.$y.' and month='.$m.' and date='.$d;
       $q->setSpreadsheetQuery($query);
       $line = $service->getListFeed($q);
 
