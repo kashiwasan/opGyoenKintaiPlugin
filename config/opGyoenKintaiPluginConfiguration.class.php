@@ -22,4 +22,3 @@ class opGyoenKintaiPluginConfiguration extends sfPluginConfiguration
     sfToolkit::addIncludePath(dirname(__FILE__).'/../lib/vendor');
   }
 }
-?>

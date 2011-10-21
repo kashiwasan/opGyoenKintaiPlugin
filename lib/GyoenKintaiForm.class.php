@@ -6,6 +6,3 @@ class GyoenKintaiForm extends sfForm
   }
 
 }
-
-?>
-
