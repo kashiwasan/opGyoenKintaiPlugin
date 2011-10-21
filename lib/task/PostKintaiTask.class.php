@@ -61,6 +61,8 @@ class PostKintaiTask extends sfBaseTask
               case 'comment':
                 $comment = $list->getText();
                 break;
+              default:
+                break;
             }
           }
           $keitai = substr($data, 0, 1);

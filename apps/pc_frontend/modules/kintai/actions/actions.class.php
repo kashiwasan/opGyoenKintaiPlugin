@@ -307,6 +307,8 @@ class kintaiActions extends sfActions
               $rest = $line->getText();
             case 'comment':
               $comment = $line->getText();
+            default:
+              break;
           }
         }
         $this->nickname = $memberName;
@@ -412,6 +414,8 @@ class kintaiActions extends sfActions
               break;
             case 'date':
               $d = $rows->getText();
+              break;
+            default:
               break;
           }
           $nowtime = time();
@@ -603,6 +607,8 @@ class kintaiActions extends sfActions
               break;
             case 'date':
               $d = $rows->getText();
+              break;
+            default:
               break;
           }
           $nowtime = time();
