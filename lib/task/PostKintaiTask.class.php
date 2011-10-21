@@ -141,8 +141,8 @@ class PostKintaiTask extends sfBaseTask
     foreach($SpreadsheetFeed->entries as $WorksheetEntry) {
       $worksheetId = split('/', $SpreadsheetFeed->entries[$i]->id->text);
       if($WorksheetEntry->title->text===$worksheetname){
-         $WorksheetId = $worksheetId[8];
-         break;
+        $WorksheetId = $worksheetId[8];
+        break;
       }
       $i++;
     }
@@ -159,8 +159,8 @@ class PostKintaiTask extends sfBaseTask
     foreach($SpreadsheetFeed->entries as $WorksheetEntry) {
       $worksheetId = split('/', $SpreadsheetFeed->entries[$i]->id->text);
       if($WorksheetEntry->title->text===$worksheetname){
-         $WorksheetId = $worksheetId[8];
-         break;
+        $WorksheetId = $worksheetId[8];
+        break;
       }
       $i++;
     }

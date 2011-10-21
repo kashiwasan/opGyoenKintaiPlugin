@@ -26,7 +26,7 @@ class opGyoenKintaiPluginActions extends sfActions
   public function executeIndex(sfWebRequest $request)
   {
     $this->form = new GyoenKintaiConfigForm();
-    
+
     if($request->isMethod(sfWebRequest::POST))
     {
       //$this->form->getCSRFToken();
@@ -53,12 +53,12 @@ class opGyoenKintaiPluginActions extends sfActions
         $this->members = $members;
         return sfView::SUCCESS;
       }
-   
+
     }else{
       $this->members = Doctrine::getTable('Member')->findAll();
       return sfView::SUCCESS;
     }
-      
+
   }
 
   public function executeEdit(sfWebRequest $request)
@@ -95,14 +95,14 @@ class opGyoenKintaiPluginActions extends sfActions
       $memberId = $request->getParameter('member_id');
       if($memberId==null)
       {
-         $this->redirect('opGyoenKintaiPlugin/list');
-         exit;
+        $this->redirect('opGyoenKintaiPlugin/list');
+        exit;
       }
       $member = Doctrine::getTable('Member')->find($memberId, null);
       if($member==null)
       {
-         $this->redirect('opGyoenKintaiPlugin/list');
-         exit;
+        $this->redirect('opGyoenKintaiPlugin/list');
+        exit;
       }
       $this->member = $member;
       $config = Doctrine::getTable('MemberConfig')->retrieveByNameAndMemberId('op_kintai_member_wid', $memberId);
