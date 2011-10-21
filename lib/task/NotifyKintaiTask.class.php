@@ -1,7 +1,8 @@
 <?php
 class NotifyKintaiTask extends sfBaseTask
 {
-  protected function configure() {
+  protected function configure()
+  {
     mb_language('Japanese');
     mb_internal_encoding('utf-8');
 
@@ -12,7 +13,8 @@ class NotifyKintaiTask extends sfBaseTask
     $this->addArgument('mode', null , sfCommandOption::PARAMETER_REQUIRED, 'mode');
   }
 
-  protected function execute($arguments = array(), $options = array()) {
+  protected function execute($arguments = array(), $options = array())
+  {
     $databaseManager = new sfDatabaseManager($this->configuration);
     $url = sfConfig::get('op_base_url');
     if($arguments['mode']=='morning'){

@@ -176,7 +176,8 @@ class kintaiActions extends sfActions
     }
   }
 
-  public function executeAjaxRegist(sfWebRequest $request){
+  public function executeAjaxRegist(sfWebRequest $request)
+  {
     $this->nickname = $this->getUser()->getMember()->getName();
     $y = $request->getParameter('y');
     if(empty($y)){ $y = date('Y'); }
@@ -197,7 +198,8 @@ class kintaiActions extends sfActions
   }
 
 
-  public function executeAjaxRegistEasy(sfWebRequest $request){
+  public function executeAjaxRegistEasy(sfWebRequest $request)
+  {
     $this->nickname = $this->getUser()->getMember()->getName();
     $y = $request->getParameter('y');
     if(empty($y)){ $y = date('Y'); }
@@ -213,7 +215,8 @@ class kintaiActions extends sfActions
   }
 
 
-  public function executeAjaxEdit(sfWebRequest $request){
+  public function executeAjaxEdit(sfWebRequest $request)
+  {
     $memberId = $this->getUser()->getMemberId();
     $memberName = $this->getUser()->getMember()->getName();
     $y = $request->getParameter('y');
@@ -265,7 +268,8 @@ class kintaiActions extends sfActions
     }
   }
 
-  public function executeAjaxSend(sfWebRequest $request){
+  public function executeAjaxSend(sfWebRequest $request)
+  {
     $service = self::getZendGdata();
     $wid = self::getRowId();
     if($request->isMethod(sfWebRequest::POST)){
@@ -382,7 +386,8 @@ class kintaiActions extends sfActions
     }
   }
 
-  public function executeDownloadCSV(sfWebRequesr $request){
+  public function executeDownloadCSV(sfWebRequesr $request)
+  {
     //definition
     $service = self::getZendGdata();
     $memberId = $this->getUser()->getMemberId();
@@ -412,13 +417,14 @@ class kintaiActions extends sfActions
     }
   }
 
-  public function executeAjaxTextInput(sfWebRequest $request){
+  public function executeAjaxTextInput(sfWebRequest $request)
+  {
     $this->setLayout(false);
     return sfView::SUCCESS;
   }
 
-  public function executeAjaxTextSend(sfWebRequest $request){
-
+  public function executeAjaxTextSend(sfWebRequest $request)
+  {
     $service = self::getZendGdata();
     $wid = self::getRowId();
     if($request->isMethod(sfWebRequest::POST)){
@@ -553,7 +559,8 @@ class kintaiActions extends sfActions
     return new Zend_Gdata_Spreadsheets($client);
   } 
 
-  private function getMemberWorkSheetId($memberId){
+  private function getMemberWorkSheetId($memberId)
+  {
     $service = self::getZendGdata();
     $member = Doctrine::getTable('Member')->find($memberId);
     $memberEmailAddress = $member->getEmailAddress(false);
@@ -574,7 +581,8 @@ class kintaiActions extends sfActions
     return $worksheetId;
   }
 
-  private function getRowId(){
+  private function getRowId()
+  {
     $service = self::getZendGdata();
     $worksheetname = 'RAW';
     $documentQuery = new Zend_Gdata_Spreadsheets_DocumentQuery();

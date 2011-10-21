@@ -11,7 +11,8 @@ class PostKintaiTask extends sfBaseTask
     $this->breafDescription  = 'execute opGyoenKintaiPlugin bot';
   }
 
-  public function execute($arguments = array(), $options = array()){
+  public function execute($arguments = array(), $options = array())
+  {
     echo "START KINTAI BOT.\n";
     $details = array();
     $databaseManager = 	new sfDatabaseManager($this->configuration);
@@ -120,7 +121,8 @@ class PostKintaiTask extends sfBaseTask
     }
   }
 
-  public static function getZendGdata() {
+  public static function getZendGdata()
+  {
     $id = Doctrine::getTable('SnsConfig')->get('op_kintai_spid');
     $pw = Doctrine::getTable('SnsConfig')->get('op_kintai_sppw');
     $service = Zend_Gdata_Spreadsheets::AUTH_SERVICE_NAME;
@@ -128,7 +130,8 @@ class PostKintaiTask extends sfBaseTask
     return new Zend_Gdata_Spreadsheets($client);
   }
 
-  private function getMemberWorkSheetId($memberId){
+  private function getMemberWorkSheetId($memberId)
+  {
     $service = self::getZendGdata();
     $member = Doctrine::getTable('Member')->find($memberId);
     $memberEmailAddress = $member->getEmailAddress(false);
@@ -149,7 +152,8 @@ class PostKintaiTask extends sfBaseTask
     return $worksheetId;
   }
 
-  private function getRowId(){
+  private function getRowId()
+  {
     $service = self::getZendGdata();
     $worksheetname = 'RAW';
     $documentQuery = new Zend_Gdata_Spreadsheets_DocumentQuery();
