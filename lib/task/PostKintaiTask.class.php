@@ -134,37 +134,37 @@ class PostKintaiTask extends sfBaseTask
     $memberEmailAddress = $member->getEmailAddress(false);
     $memberEmailAddressUserName  = explode("@", $memberEmailAddress);
     $worksheetname = $memberEmailAddressUserName[0];
-    $DocumentQuery = new Zend_Gdata_Spreadsheets_DocumentQuery();
-    $DocumentQuery->setSpreadsheetKey(opConfig::get('op_kintai_spkey'));
-    $SpreadsheetFeed = $service->getWorksheetFeed($DocumentQuery);
+    $documentQuery = new Zend_Gdata_Spreadsheets_DocumentQuery();
+    $documentQuery->setSpreadsheetKey(opConfig::get('op_kintai_spkey'));
+    $spreadsheetFeed = $service->getWorksheetFeed($documentQuery);
     $i = 0;
-    foreach($SpreadsheetFeed->entries as $WorksheetEntry) {
-      $worksheetId = split('/', $SpreadsheetFeed->entries[$i]->id->text);
-      if($WorksheetEntry->title->text===$worksheetname){
-        $WorksheetId = $worksheetId[8];
+    foreach($spreadsheetFeed->entries as $worksheetEntry) {
+      $worksheetIdText = split('/', $spreadsheetFeed->entries[$i]->id->text);
+      if($worksheetEntry->title->text===$worksheetname){
+        $worksheetId = $worksheetIdText[8];
         break;
       }
       $i++;
     }
-    return $WorksheetId;
+    return $worksheetId;
   }
 
   private function getRowId(){
     $service = self::getZendGdata();
     $worksheetname = "RAW";
-    $DocumentQuery = new Zend_Gdata_Spreadsheets_DocumentQuery();
-    $DocumentQuery->setSpreadsheetKey(opConfig::get('op_kintai_spkey'));
-    $SpreadsheetFeed = $service->getWorksheetFeed($DocumentQuery);
+    $documentQuery = new Zend_Gdata_Spreadsheets_DocumentQuery();
+    $documentQuery->setSpreadsheetKey(opConfig::get('op_kintai_spkey'));
+    $spreadsheetFeed = $service->getWorksheetFeed($documentQuery);
     $i = 0;
-    foreach($SpreadsheetFeed->entries as $WorksheetEntry) {
-      $worksheetId = split('/', $SpreadsheetFeed->entries[$i]->id->text);
-      if($WorksheetEntry->title->text===$worksheetname){
-        $WorksheetId = $worksheetId[8];
+    foreach($spreadsheetFeed->entries as $worksheetEntry) {
+      $worksheetIdText = split('/', $spreadsheetFeed->entries[$i]->id->text);
+      if($worksheetEntry->title->text===$worksheetname){
+        $worksheetId = $worksheetIdText[8];
         break;
       }
       $i++;
     }
-    return $WorksheetId;
+    return $worksheetId;
   }
 
 }

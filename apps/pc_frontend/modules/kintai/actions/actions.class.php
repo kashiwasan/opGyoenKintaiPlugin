@@ -27,25 +27,25 @@ class kintaiActions extends sfActions
   {
     //definition
     $service = self::getZendGdata();
-    $Id = $this->getRequestParameter('id');
-    $memberId = isset($Id) ? $Id : $this->getUser()->getMemberId();
-    $MemberS = Doctrine::getTable('Member')->find($memberId);
-    if(!$MemberS){ return sfView::ERROR; }
+    $id = $this->getRequestParameter('id');
+    $memberId = isset($id) ? $id : $this->getUser()->getMemberId();
+    $memberS = Doctrine::getTable('Member')->find($memberId);
+    if(!$memberS){ return sfView::ERROR; }
     if ($memberId !== $this->getUser()->getMemberId()){
       sfConfig::set('sf_nav_type', 'friend');
       sfConfig::set('sf_nav_id', $memberId);
     }
-    $this->memberName = $MemberS->getName();
+    $this->memberName = $memberS->getName();
     $y = $this->getRequestParameter('year');
-    $Y = empty($y)? date("Y") : $y; 
+    $year = empty($y)? date("Y") : $y;
     $m = $this->getRequestParameter('month');
-    $M = empty($m)? date("m") : $m;
+    $month = empty($m)? date("m") : $m;
     $wid = self::getRowId();
     //throw query
     $q = new Zend_Gdata_Spreadsheets_ListQuery();
     $q->setSpreadsheetKey(opConfig::get('op_kintai_spkey', null));
     $q->setWorksheetId($wid);
-    $query = "id={$memberId} and year={$Y} and month={$M}";
+    $query = "id={$memberId} and year={$year} and month={$month}";
     $q->setSpreadsheetQuery($query);
     $line = $service->getListFeed($q);
 
@@ -53,8 +53,8 @@ class kintaiActions extends sfActions
       $this->line = $line;
       $this->currentMember = $this->getUser()->getMember()->getId();
       $this->viewmember = $memberId;
-      $this->year = $Y;
-      $this->month = $M;
+      $this->year = $year;
+      $this->month = $month;
       return sfView::SUCCESS;
     }else{
       return sfView::ERROR;
@@ -386,24 +386,24 @@ class kintaiActions extends sfActions
     //definition
     $service = self::getZendGdata();
     $memberId = $this->getUser()->getMemberId();
-    $MemberS = Doctrine::getTable('Member')->find($memberId);
-    $this->memberName = $MemberS->getName();
+    $memberS = Doctrine::getTable('Member')->find($memberId);
+    $this->memberName = $memberS->getName();
     $y = $this->getRequestParameter('year');
-    $Y = empty($y)? date("Y") : $y;
+    $year = empty($y)? date("Y") : $y;
     $m = $this->getRequestParameter('month');
-    $M = empty($m)? date("m") : $m;
+    $month = empty($m)? date("m") : $m;
     $wid = self::getMemberWorkSheetId($memberId);
     //throw query
     $q = new Zend_Gdata_Spreadsheets_ListQuery();
     $q->setSpreadsheetKey(opConfig::get('op_kintai_spkey', null));
     $q->setWorksheetId($wid);
-    $query = "year={$Y} and month={$M}";
+    $query = "year={$year} and month={$month}";
     $q->setSpreadsheetQuery($query);
     $line = $service->getListFeed($q);
 
     if($line->entries[0]){
-      $this->year = $Y;
-      $this->month = $M;
+      $this->year = $year;
+      $this->month = $month;
       $this->line = $line;
       $this->setLayout(false);
       return sfView::SUCCESS;
@@ -559,36 +559,36 @@ class kintaiActions extends sfActions
     $memberEmailAddress = $member->getEmailAddress(false);
     $memberEmailAddressUserName  = explode("@", $memberEmailAddress);
     $worksheetname = $memberEmailAddressUserName[0];
-    $DocumentQuery = new Zend_Gdata_Spreadsheets_DocumentQuery();
-    $DocumentQuery->setSpreadsheetKey(opConfig::get('op_kintai_spkey'));
-    $SpreadsheetFeed = $service->getWorksheetFeed($DocumentQuery);
+    $documentQuery = new Zend_Gdata_Spreadsheets_DocumentQuery();
+    $documentQuery->setSpreadsheetKey(opConfig::get('op_kintai_spkey'));
+    $spreadsheetFeed = $service->getWorksheetFeed($documentQuery);
     $i = 0;
-    foreach($SpreadsheetFeed->entries as $WorksheetEntry) {
-      $worksheetId = split('/', $SpreadsheetFeed->entries[$i]->id->text);
-      if($WorksheetEntry->title->text===$worksheetname){
-        $WorksheetId = $worksheetId[8];
+    foreach($spreadsheetFeed->entries as $worksheetEntry) {
+      $worksheetIdText = split('/', $spreadsheetFeed->entries[$i]->id->text);
+      if($worksheetEntry->title->text===$worksheetname){
+        $worksheetId = $worksheetIdText[8];
         break;
       }
       $i++;
     }
-    return $WorksheetId;
+    return $worksheetId;
   }
 
   private function getRowId(){
     $service = self::getZendGdata();
     $worksheetname = "RAW";
-    $DocumentQuery = new Zend_Gdata_Spreadsheets_DocumentQuery();
-    $DocumentQuery->setSpreadsheetKey(opConfig::get('op_kintai_spkey'));
-    $SpreadsheetFeed = $service->getWorksheetFeed($DocumentQuery);
+    $documentQuery = new Zend_Gdata_Spreadsheets_DocumentQuery();
+    $documentQuery->setSpreadsheetKey(opConfig::get('op_kintai_spkey'));
+    $spreadsheetFeed = $service->getWorksheetFeed($documentQuery);
     $i = 0;
-    foreach($SpreadsheetFeed->entries as $WorksheetEntry) {
-      $worksheetId = split('/', $SpreadsheetFeed->entries[$i]->id->text);
-      if($WorksheetEntry->title->text===$worksheetname){
-        $WorksheetId = $worksheetId[8];
+    foreach($spreadsheetFeed->entries as $worksheetEntry) {
+      $worksheetIdText = split('/', $spreadsheetFeed->entries[$i]->id->text);
+      if($worksheetEntry->title->text===$worksheetname){
+        $worksheetId = $worksheetIdText[8];
         break;
       }
       $i++;
     }
-    return $WorksheetId;
+    return $worksheetId;
   }
 }
