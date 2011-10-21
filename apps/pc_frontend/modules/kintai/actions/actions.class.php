@@ -55,6 +55,7 @@ class kintaiActions extends sfActions
       $this->viewmember = $memberId;
       $this->year = $year;
       $this->month = $month;
+
       return sfView::SUCCESS;
     }else{
       return sfView::ERROR;
@@ -169,6 +170,7 @@ class kintaiActions extends sfActions
           $arr = array('status' => 'err2', 'msg' => '通信エラーです。（スプレッドシートサーバーと通信ができませんでした。）');
         }
       }
+
       return $this->renderText(json_encode($arr));
     }else{
       $this->redirect('kintai');
@@ -194,6 +196,7 @@ class kintaiActions extends sfActions
     $this->m = $m;
     $this->d = $d;
     $this->setLayout(false);
+
     return sfView::SUCCESS;
   }
 
@@ -211,6 +214,7 @@ class kintaiActions extends sfActions
     $this->m = $m;
     $this->d = $d;
     $this->setLayout(false);
+
     return sfView::SUCCESS;
   }
 
@@ -264,6 +268,7 @@ class kintaiActions extends sfActions
       $this->rest = $rest;
       $this->comment = $comment;
       $this->setLayout(false);
+
       return sfView::SUCCESS;
     }
   }
@@ -380,6 +385,7 @@ class kintaiActions extends sfActions
           $arr = array('status' => 'err2', 'msg' => '通信エラーです。（スプレッドシートサーバーと通信ができませんでした。）');
         }
       }
+
       return $this->renderText(json_encode($arr));
     }else{
       return $this->renderText('Error: POSTリクエストで送信されなかった為、処理を中断しました。');
@@ -411,6 +417,7 @@ class kintaiActions extends sfActions
       $this->month = $month;
       $this->line = $line;
       $this->setLayout(false);
+
       return sfView::SUCCESS;
     }else{
       return sfView::ERROR;
@@ -420,6 +427,7 @@ class kintaiActions extends sfActions
   public function executeAjaxTextInput(sfWebRequest $request)
   {
     $this->setLayout(false);
+
     return sfView::SUCCESS;
   }
 
@@ -544,6 +552,7 @@ class kintaiActions extends sfActions
           $arr = array('status' => 'err2', 'msg' => '通信エラーです。（スプレッドシートサーバーと通信ができませんでした。）');
         }
       }
+
       return $this->renderText(json_encode($arr));
     }else{
       return $this->renderText('Error: POSTリクエストで送信されなかった為、処理を中断しました。');
@@ -556,6 +565,7 @@ class kintaiActions extends sfActions
     $pw = Doctrine::getTable('SnsConfig')->get('op_kintai_sppw');
     $service = Zend_Gdata_Spreadsheets::AUTH_SERVICE_NAME;
     $client = Zend_Gdata_ClientLogin::getHttpClient($id, $pw, $service);
+
     return new Zend_Gdata_Spreadsheets($client);
   } 
 
@@ -578,6 +588,7 @@ class kintaiActions extends sfActions
       }
       $i++;
     }
+
     return $worksheetId;
   }
 
@@ -597,6 +608,7 @@ class kintaiActions extends sfActions
       }
       $i++;
     }
+
     return $worksheetId;
   }
 }

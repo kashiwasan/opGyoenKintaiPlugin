@@ -37,6 +37,7 @@ class opGyoenKintaiPluginActions extends sfActions
         $this->redirect('opGyoenKintaiPlugin/index');
       }
     }
+
     return sfView::SUCCESS;
   }
 
@@ -51,11 +52,13 @@ class opGyoenKintaiPluginActions extends sfActions
         return sfView::ERROR;
       }else{
         $this->members = $members;
+
         return sfView::SUCCESS;
       }
 
     }else{
       $this->members = Doctrine::getTable('Member')->findAll();
+
       return sfView::SUCCESS;
     }
 
@@ -87,6 +90,7 @@ class opGyoenKintaiPluginActions extends sfActions
           $this->message = '登録しました。';
           $this->member = $member;
           $this->value = $wid;
+
           return sfView::SUCCESS;
         }
       }
@@ -111,6 +115,7 @@ class opGyoenKintaiPluginActions extends sfActions
       }else{
         $this->value = '';
       }
+
       return sfView::SUCCESS;
     }
   }
