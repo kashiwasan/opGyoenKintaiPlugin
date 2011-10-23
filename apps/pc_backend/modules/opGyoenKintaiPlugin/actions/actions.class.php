@@ -26,91 +26,111 @@ class opGyoenKintaiPluginActions extends sfActions
   public function executeIndex(sfWebRequest $request)
   {
     $this->form = new GyoenKintaiConfigForm();
-    
-    if($request->isMethod(sfWebRequest::POST))
+
+    if ($request->isMethod(sfWebRequest::POST))
     {
       //$this->form->getCSRFToken();
       $this->form->bind($request->getParameter('kintai_config'));
-      if($this->form->isValid())
+      if ($this->form->isValid())
       {
         $this->form->save();
         $this->redirect('opGyoenKintaiPlugin/index');
       }
     }
+
     return sfView::SUCCESS;
   }
 
   public function executeList(sfWebRequest $request)
   {
-    if($request->isMethod(sfWebRequest::POST))
+    if ($request->isMethod(sfWebRequest::POST))
     {
       $memberId = $request->getParameter('member_id');
       $members = Doctrine::getTable('Member')->find($memberId, null);
-      if($members==null)
+      if ($members==null)
       {
         return sfView::ERROR;
-      }else{
+      }
+      else
+      {
         $this->members = $members;
+
         return sfView::SUCCESS;
       }
-   
-    }else{
+
+    }
+    else
+    {
       $this->members = Doctrine::getTable('Member')->findAll();
+
       return sfView::SUCCESS;
     }
-      
+
   }
 
   public function executeEdit(sfWebRequest $request)
   {
     $this->form = new sfForm();
-    if($request->isMethod(sfWebRequest::POST))
+    if ($request->isMethod(sfWebRequest::POST))
     {
       $memberId = $request->getParameter('member_id');
       $wid = $request->getParameter('wid');
-      if(!$memberId || !$wid)
+      if (!$memberId || !$wid)
       {
         return sfView::ERROR;
-      }else{
+      }
+      else
+      {
         $member = Doctrine::getTable('Member')->find($memberId, null);
-        if($member==null){
+        if ($member==null)
+        {
           return sfView::ERROR;
-        }else{
+        }
+        else
+        {
           $config = Doctrine::getTable('MemberConfig')->retrieveByNameAndMemberId('op_kintai_member_wid', $memberId);
-          if(!$config) {
+          if (!$config)
+          {
             $config = new MemberConfig();
             $config->setName('op_kintai_member_wid');
             $config->setMember($member);
           }
           $config->setValue($wid);
           $config->save();
-          $this->message = "登録しました。";
+          $this->message = '登録しました。';
           $this->member = $member;
           $this->value = $wid;
+
           return sfView::SUCCESS;
         }
       }
 
-    }else{
+    }
+    else
+    {
       $memberId = $request->getParameter('member_id');
-      if($memberId==null)
+      if ($memberId==null)
       {
-         $this->redirect('opGyoenKintaiPlugin/list');
-         exit;
+        $this->redirect('opGyoenKintaiPlugin/list');
+        exit;
       }
       $member = Doctrine::getTable('Member')->find($memberId, null);
-      if($member==null)
+      if ($member==null)
       {
-         $this->redirect('opGyoenKintaiPlugin/list');
-         exit;
+        $this->redirect('opGyoenKintaiPlugin/list');
+        exit;
       }
       $this->member = $member;
       $config = Doctrine::getTable('MemberConfig')->retrieveByNameAndMemberId('op_kintai_member_wid', $memberId);
-      if($config){
+      if ($config)
+      {
         $this->value= $config->getValue();
-      }else{
-        $this->value = "";
       }
+      else
+      {
+        $this->value = '';
+      }
+
       return sfView::SUCCESS;
     }
   }

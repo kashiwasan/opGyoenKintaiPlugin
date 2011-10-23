@@ -1,23 +1,23 @@
-<div class="partsHeading"><h3><?php echo $member_name; ?>さんの勤怠( <?php echo $year; ?>年<?php echo $month; ?>月)</h3></div>
+<div class="partsHeading"><h3><?php echo $memberName; ?>さんの勤怠( <?php echo $year; ?>年<?php echo $month; ?>月)</h3></div>
 <div class="block">
 <?php
 $myear = $year;
 $nyear = $year;
-$NextMonth = $month + 1;
-$PreviousMonth = $month - 1;
-if($NextMonth==13){
-  $NextMonth = 1;
+$nextMonth = $month + 1;
+$previousMonth = $month - 1;
+if($nextMonth==13){
+  $nextMonth = 1;
   $nyear = $year + 1;
 }
-if($PreviousMonth==0){
-  $PreviousMonth = 12;
+if($previousMonth==0){
+  $previousMonth = 12;
   $myear = $year - 1;
 }
 
 ?>
 <div id="kintai_pager" style="float: right;">
-<a href="./kintai?year=<?php echo $myear; ?>&month=<?php echo $PreviousMonth; ?>&id=<?php echo $viewmember; ?>">前の月</a> | <a href="./kintai?year=<?php echo $nyear; ?>&month=<?php echo $NextMonth; ?>&id=<?php echo $viewmember; ?>">次の月</a> 
-<form action="./kintai?id=<?php echo $viewmember; ?>" method="GET"><input type="text" name="year" value="<?php echo $nyear; ?>" size="4" maxlength="4" / >年 <input type="text" name="month" value="<?php echo $NextMonth; ?>" size="4" maxlength="4" />月 <input type="submit" name="submit" value="移動" /></form>
+<a href="./kintai?year=<?php echo $myear; ?>&month=<?php echo $previousMonth; ?>&id=<?php echo $viewmember; ?>">前の月</a> | <a href="./kintai?year=<?php echo $nyear; ?>&month=<?php echo $nextMonth; ?>&id=<?php echo $viewmember; ?>">次の月</a> 
+<form action="./kintai?id=<?php echo $viewmember; ?>" method="GET"><input type="text" name="year" value="<?php echo $nyear; ?>" size="4" maxlength="4" / >年 <input type="text" name="month" value="<?php echo $nextMonth; ?>" size="4" maxlength="4" />月 <input type="submit" name="submit" value="移動" /></form>
 </div>
 <br />
 <table width="100%">
@@ -30,9 +30,9 @@ $detail = array();
 foreach($line as $entry){
   
   //echo "<tr>";
-  $line_list = $entry->getCustom();
+  $lineList = $entry->getCustom();
   $result = array();
-  foreach($line_list as $line2){
+  foreach($lineList as $line2){
     $key = $line2->getColumnName();
     switch($key){
       case "rest":
