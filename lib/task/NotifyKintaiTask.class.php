@@ -6,7 +6,7 @@ class NotifyKintaiTask extends sfBaseTask {
 
     $this->namespace = 'opKintai';
     $this->name      = 'notify';
-    $this->aliases   = 'kintai-notify';
+    $this->aliases   = array('kintai-notify');
     $this->briefDescription = 'Notify to the member who do not post the works on Activity.';
     $this->addArgument('mode', null , sfCommandOption::PARAMETER_REQUIRED, 'mode');
   }
