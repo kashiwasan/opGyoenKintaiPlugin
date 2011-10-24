@@ -40,17 +40,11 @@ class PostKintaiTask extends sfBaseTask
               case "year":
                 $y = $list->getText();
                 break;
-              case "month": 
-                $m = $list->getText();
-                break;
               case "date":
-                $d = "{$list->getText()}";
+                $date = $list->getText();
                 break;
               case "data":
                 $data = $list->getText();
-                break;
-              case "rest":
-                $rest = $list->getText();
                 break;
               case "comment":
                 $comment = $list->getText();
@@ -116,7 +110,7 @@ class PostKintaiTask extends sfBaseTask
         $line_list = null;
         $line = null;
         // var_dump($details);
-      }
+    
     }
   }
 

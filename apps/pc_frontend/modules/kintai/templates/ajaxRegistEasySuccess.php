@@ -105,26 +105,26 @@
 <tr>
 <td>休憩時間(分)</td><td>
 <select name="rest" id="kintai_easy_regist_rest">
-<option value="00" selected="selected">00</option>
-<option value="05">05</option>
-<option value="10">10</option>
-<option value="15">15</option>
-<option value="20">20</option>
-<option value="25">25</option>
-<option value="30">30</option>
-<option value="35">35</option>
-<option value="40">40</option>
-<option value="45">45</option>
-<option value="50">50</option>
-<option value="55">55</option>
-<option value="60">60</option>
-<option value="65">65</option>
-<option value="70">70</option>
-<option value="75">75</option>
-<option value="80">80</option>
-<option value="85">85</option>
-<option value="90">90</option>
-<option value="95">95</option>
+<option value="000" selected="selected">00</option>
+<option value="005">05</option>
+<option value="010">10</option>
+<option value="015">15</option>
+<option value="020">20</option>
+<option value="025">25</option>
+<option value="030">30</option>
+<option value="035">35</option>
+<option value="040">40</option>
+<option value="045">45</option>
+<option value="050">50</option>
+<option value="055">55</option>
+<option value="060">60</option>
+<option value="065">65</option>
+<option value="070">70</option>
+<option value="075">75</option>
+<option value="080">80</option>
+<option value="085">85</option>
+<option value="090">90</option>
+<option value="095">95</option>
 <option value="100">100</option>
 <option value="105">105</option>
 <option value="110">110</option>
