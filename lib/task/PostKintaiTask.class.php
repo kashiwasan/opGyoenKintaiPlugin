@@ -80,7 +80,7 @@ class PostKintaiTask extends sfBaseTask
         if($m==1 || $m==3 || $m==5 || $m==7 || $m==8 || $m==10 || $m==12){
           $maxday = 31;
         }elseif($m==2){
-          if(($year %4 == 0 && $year %100 != 0) || $year %400 == 0)
+          if(($year %4 == 0 && $year %100 != 0) || $year %400 == 0){
             $maxday = 29;
           }else{
             $maxday = 28;
