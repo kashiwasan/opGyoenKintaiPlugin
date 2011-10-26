@@ -1,5 +1,7 @@
 <div class="partsHeading"><h3><?php echo $member_name; ?>さんの勤怠( <?php echo $year; ?>年<?php echo $month; ?>月)</h3></div>
 <div class="block">
+<?php if(is_null($member_editablelink)) : ?>
+
 <table width="50%">
 <tr><td width="25%">年月日</td><td width="25%"></td></tr>
 
@@ -24,6 +26,7 @@ echo($htmls);
 
 </table>
 <br />
+<?php endif; ?>
 <?php if(!is_null($member_editablelink)) : ?>
 【社員さん用編集リンク】<br />
 以下のURLより直接編集可能です。<br />
