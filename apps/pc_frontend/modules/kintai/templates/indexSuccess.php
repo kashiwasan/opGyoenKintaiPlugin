@@ -24,6 +24,11 @@ echo($htmls);
 
 </table>
 <br />
+<?php if(!is_null($member_editablelink)) : ?>
+【社員さん用編集リンク】<br />
+以下のURLより直接編集可能です。<br />
+<a href="<?php echo $member_editablelink; ?>" target="_blank"><?php echo $member_editablelink?></a><br /><br />
+<?php endif; ?>
 <?php echo $member_name; ?> さんの勤怠明細（スプレッドシート）はこちらです。<br />
 <a href="<?php echo $member_splink; ?>" target="_blank"><?php echo $member_splink; ?></a>
 <br /><br />

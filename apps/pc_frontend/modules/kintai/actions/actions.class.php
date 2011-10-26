@@ -36,7 +36,7 @@ class kintaiActions extends sfActions
       sfConfig::set('sf_nav_id', $member_id);
     }
     $this->member_name = $MemberS->getName();
-    $wid = self::getRowId();
+    $wid = self::getRowId($service);
 
     for($i=0;$i<3;$i++){
       if($i==0){
@@ -60,8 +60,14 @@ class kintaiActions extends sfActions
       }
     }
     
-    $memberSpreadSheetKey = self::getMemberSpreadSheetKey($member_id);
+    $memberSpreadSheetKey = self::getMemberMasterSpreadSheetKey($service, $member_id);
     $this->member_splink = "https://spreadsheets.google.com/ccc?key=".$memberSpreadSheetKey."&hl=ja";
+    $memberEditableKey = self::getMemberSpreadSheetKey($service, $member_id);
+    if(!is_null($memberEditableKey)){
+      $this->member_editablelink = "https://spreadsheets.google.com/ccc?key=".$memberEditableKey."&hl=ja";
+    }else{
+      $this->member_editablelink = null;
+    }
     $this->data = $data;
     $this->currentMember = $this->getUser()->getMember()->getId();
     $this->viewmember = $member_id;
@@ -77,7 +83,7 @@ class kintaiActions extends sfActions
   public function executeSend2(sfWebRequest $request)
   {
     $service = self::getZendGdata();
-    $wid = self::getRowId();
+    $wid = self::getRowId($service);
     if($request->isMethod(sfWebRequest::POST)){
       //Definition
       $memberId = $this->getUser()->getMemberId();
@@ -254,7 +260,7 @@ class kintaiActions extends sfActions
     $m = $request->getParameter('m');
     $d = $request->getParameter('d');
     $service = self::getZendGdata();
-    $wid = self::getRowId();
+    $wid = self::getRowId($service);
     $q = new Zend_Gdata_Spreadsheets_ListQuery();
     $q->setSpreadsheetKey(opConfig::get('op_kintai_spkey', null));
     $q->setWorksheetId($wid);
@@ -291,7 +297,7 @@ class kintaiActions extends sfActions
 
   public function executeAjaxSend(sfWebRequest $request){
     $service = self::getZendGdata();
-    $wid = self::getRowId();
+    $wid = self::getRowId($service);
     if($request->isMethod(sfWebRequest::POST)){
       $y = $request->getParameter('y');
       $m = $request->getParameter('m');
@@ -423,32 +429,31 @@ class kintaiActions extends sfActions
     return new Zend_Gdata_Spreadsheets($client);
   } 
 
-  private function getMemberSpreadSheetKey($memberId){
-    $service = self::getZendGdata();
+  private function getMemberSpreadSheetKey($service, $memberId){
     $member = Doctrine::getTable('Member')->find($memberId);
     $memberEmailAddress = $member->getEmailAddress(false);
-    $memberSpreadsheetName = $memberEmailAddress."-kintai";
+    $spreadsheetname = $memberEmailAddress."-kintai";
     $feed = $service->getSpreadsheetFeed();
     $i = 0;
     foreach($feed->entries as $entry) {
-      if( $entry->title->text===$memberSpreadsheetName) {
+      if($entry->title->text===$spreadsheetname) {
         $aKey = split('/', $feed->entries[$i]->id->text);
         $SpreadsheetKey = $aKey[5];
         break;
-      } 
+      }
       $i++;
     }
-    return $SpreadsheetKey; 
+    if($SpreadsheetKey){
+      return $SpreadsheetKey;
+    }else{
+      return null;
+    }
   }
 
-  private function getMemberWorkSheetId($memberId){
-    $service = self::getZendGdata();
-    $member = Doctrine::getTable('Member')->find($memberId);
-    $memberEmailAddress = $member->getEmailAddress(false);
-    $memberEmailAddressUserName  = explode("@", $memberEmailAddress);
-    $worksheetname = $memberEmailAddressUserName[0];
+  private function getMemberWorkSheetId($service, $spreadsheetKey){
+    $worksheetname = "勤怠明細";
     $DocumentQuery = new Zend_Gdata_Spreadsheets_DocumentQuery();
-    $DocumentQuery->setSpreadsheetKey(opConfig::get('op_kintai_spkey'));
+    $DocumentQuery->setSpreadsheetKey($spreadsheetKey);
     $SpreadsheetFeed = $service->getWorksheetFeed($DocumentQuery);
     $i = 0;
     foreach($SpreadsheetFeed->entries as $WorksheetEntry) {
@@ -462,8 +467,46 @@ class kintaiActions extends sfActions
     return $WorksheetId;
   }
 
-  private function getRowId(){
-    $service = self::getZendGdata();
+  private function getMemberMasterSpreadSheetKey($service, $memberId){
+    $member = Doctrine::getTable('Member')->find($memberId);
+    $memberEmailAddress = $member->getEmailAddress(false);
+    $spreadsheetname = "(Master) ".$memberEmailAddress."-kintai";
+    $feed = $service->getSpreadsheetFeed();
+    $i = 0;
+    foreach($feed->entries as $entry) {
+      if( $entry->title->text===$spreadsheetname) {
+        $aKey = split('/', $feed->entries[$i]->id->text);
+        $SpreadsheetKey = $aKey[5];
+        break;
+      }
+      $i++;
+    }
+    if($SpreadsheetKey){
+      return $SpreadsheetKey;
+    }else{
+      return null;
+    }
+  }
+
+  private function getMemberMasterWorkSheetId($service, $spreadsheetKey){
+    $worksheetname = "勤怠明細";
+    $DocumentQuery = new Zend_Gdata_Spreadsheets_DocumentQuery();
+    $DocumentQuery->setSpreadsheetKey($spreadsheetKey);
+    $SpreadsheetFeed = $service->getWorksheetFeed($DocumentQuery);
+    $i = 0;
+    foreach($SpreadsheetFeed->entries as $WorksheetEntry) {
+      $worksheetId = split('/', $SpreadsheetFeed->entries[$i]->id->text);
+      if($WorksheetEntry->title->text===$worksheetname){
+         $WorksheetId = $worksheetId[8];
+         break;
+      }
+      $i++;
+    }
+    return $WorksheetId;
+  }
+
+
+  private function getRowId($service){
     $worksheetname = "RAW";
     $DocumentQuery = new Zend_Gdata_Spreadsheets_DocumentQuery();
     $DocumentQuery->setSpreadsheetKey(opConfig::get('op_kintai_spkey'));
