@@ -246,6 +246,12 @@ class PostKintaiTask extends sfBaseTask
                     $srest = substr($data, 9, 3);
                     $srh = floor($srest / 60);
                     $srm = $srest - ( $srh * 60 );
+                    if ($srh==0){
+                      $srh = "0";
+                    }
+                    if ($zrm==0){
+                      $srm = "0";
+                    }
                   }else{
                     $zsh = substr($data, 1, 2);
                     $zsm = substr($data, 3, 2);
@@ -254,6 +260,12 @@ class PostKintaiTask extends sfBaseTask
                     $zrest = substr($data, 9, 3);
                     $zrh = floor($zrest / 60);
                     $zrm = $zrest - ( $zrh * 60 );
+                    if ($zrh==0){
+                      $zrh = "0";
+                    }
+                    if ($zrm==0){
+                      $zrm = "0";
+                    }
                   }
                 }elseif(strlen($data)==24){
                   $data1 = substr($data, 0, 12);
@@ -267,6 +279,12 @@ class PostKintaiTask extends sfBaseTask
                     $srest = substr($data1, 9, 3);
                     $srh = floor($srest / 60);
                     $srm = $srest - ( $srh * 60 );
+                    if ($srh==0){
+                      $srh = "0";
+                    }
+                    if ($srm==0){
+                      $srm = "0";
+                    }
                   }else{
                     $zsh = substr($data1, 1, 2);
                     $zsm = substr($data1, 3, 2);
@@ -275,6 +293,12 @@ class PostKintaiTask extends sfBaseTask
                     $zrest = substr($data1, 9, 3);
                     $zrh = floor($zrest / 60);
                     $zrm = $zrest - ( $zrh * 60 );
+                    if ($zrh==0){
+                      $zrh = "0";
+                    }
+                    if ($zrm==0){
+                      $zrm = "0";
+                    }
                   }
                   if($keitai2=="S"){
                     $ssh = substr($data2, 1, 2);
@@ -284,6 +308,12 @@ class PostKintaiTask extends sfBaseTask
                     $srest = substr($data2, 9, 3);
                     $srh = floor($srest / 60);
                     $srm = $srest - ( $srh * 60 );
+                    if ($srh==0){
+                      $srh = "0";
+                    }
+                    if ($zrm==0){
+                      $srm = "0";
+                    }
                   }else{
                     $zsh = substr($data2, 1, 2);
                     $zsm = substr($data2, 3, 2);
@@ -292,6 +322,12 @@ class PostKintaiTask extends sfBaseTask
                     $zrest = substr($data2, 9, 3);
                     $zrh = floor($zrest / 60);
                     $zrm = $zrest - ( $zrh * 60 );
+                    if ($zrh==0){
+                      $zrh = "0";
+                    }
+                    if ($zrm==0){
+                      $zrm = "0";
+                    }
                   }
                 }
   
@@ -368,6 +404,12 @@ class PostKintaiTask extends sfBaseTask
                       $srest = substr($data, 9, 3);
                       $srh = floor($srest / 60);
                       $srm = $srest - ( $srh * 60 );
+                      if ($srh==0){
+                        $srh = "0";
+                      }
+                      if ($srm==0){
+                        $srm = "0";
+                      }
                     }else{
                       $zsh = substr($data, 1, 2);
                       $zsm = substr($data, 3, 2);
@@ -376,6 +418,12 @@ class PostKintaiTask extends sfBaseTask
                       $zrest = substr($data, 9, 3);
                       $zrh = floor($zrest / 60);
                       $zrm = $zrest - ( $zrh * 60 );
+                      if ($zrh==0){
+                        $zrh = "0";
+                      }
+                      if ($zrm==0){
+                        $zrm = "0";
+                      }
                     }
                   }elseif(strlen($data)==24){
                     $data1 = substr($data, 0, 12);
@@ -389,6 +437,12 @@ class PostKintaiTask extends sfBaseTask
                       $srest = substr($data1, 9, 3);
                       $srh = floor($srest / 60);
                       $srm = $srest - ( $srh * 60 );
+                      if ($srh==0){
+                        $srh = "0";
+                      }
+                      if ($srm==0){
+                        $srm = "0";
+                      }
                     }else{
                       $zsh = substr($data1, 1, 2);
                       $zsm = substr($data1, 3, 2);
@@ -397,6 +451,12 @@ class PostKintaiTask extends sfBaseTask
                       $zrest = substr($data1, 9, 3);
                       $zrh = floor($zrest / 60);
                       $zrm = $zrest - ( $zrh * 60 );
+                      if ($zrh==0){
+                        $zrh = "0";
+                      }
+                      if ($zrm==0){
+                        $zrm = "0";
+                      }
                     }
                     if($keitai2=="S"){
                       $ssh = substr($data2, 1, 2);
@@ -406,6 +466,12 @@ class PostKintaiTask extends sfBaseTask
                       $srest = substr($data2, 9, 3);
                       $srh = floor($srest / 60);
                       $srm = $srest - ( $srh * 60 );
+                      if ($srh==0){
+                        $srh = "0";
+                      }
+                      if ($srm==0){
+                        $srm = "0";
+                      }
                     }else{
                       $zsh = substr($data2, 1, 2);
                       $zsm = substr($data2, 3, 2);
@@ -414,6 +480,12 @@ class PostKintaiTask extends sfBaseTask
                       $zrest = substr($data2, 9, 3);
                       $zrh = floor($zrest / 60);
                       $zrm = $zrest - ( $zrh * 60 );
+                      if ($zrh==0){
+                        $zrh = "0";
+                      }
+                      if ($zrm==0){
+                        $zrm = "0";
+                      }
                     }
                   }
               $detail = array("date"=>$date, "ssh"=>$ssh, "ssm"=>$ssm, "seh"=>$seh, "sem"=>$sem, "srh"=>$srh, "srm"=>$srm, "zsh"=>$zsh, "zsm"=>$zsm, "zeh"=>$zeh, "zem"=>$zem, "zrh"=>$zrh, "zrm"=>$zrm);
