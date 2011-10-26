@@ -15,102 +15,434 @@ class PostKintaiTask extends sfBaseTask
     echo "START KINTAI BOT.\n";
     $details = array();
     $databaseManager = 	new sfDatabaseManager($this->configuration);
-    $y = date('Y');
-    $m = date('m');
-    $nowday = date('d');
     $service = self::getZendGdata();
     $members = Doctrine::getTable('Member')->findAll();
+    $rawKey = opConfig::get('op_kintai_spkey', null);
+    $wid = self::getRowId($service, $rawKey);
     foreach($members as $member){
+      //変数初期化
+      list($memberId, $memberspkey, $memberWorkSheetId, $memberMasterSpkey, $memberMasterWorkSheetId) = array(null, null, null, null, null,);
       $memberId = $member->getId();
-      $memberConfig = self::getMemberWorkSheetId($memberId);
-      if($memberConfig){
-        $config = $memberConfig;
-        $wid = self::getRowId();
-        $q = new Zend_Gdata_Spreadsheets_ListQuery();
-        $q->setSpreadsheetkey(opConfig::get('op_kintai_spkey'));
-        $q->setWorkSheetId($wid);
-        $query = "id={$memberId} and year={$y} and month={$m}";
-        $q->setSpreadsheetQuery($query);
-        $line_list = $service->getListFeed($q);
-        foreach($line_list as $entry){
-          $line = $entry->getCustom();
-          foreach($line as $list){
-            $key = $list->getColumnName();
-            switch($key){
-              case "year":
-                $y = $list->getText();
-                break;
-              case "date":
-                $date = $list->getText();
-                break;
-              case "data":
-                $data = $list->getText();
-                break;
-              case "comment":
-                $comment = $list->getText();
-                break;
+      $memberspkey = self::getMemberSpreadSheetKey($service, $memberId);
+      if(!is_null($memberspkey)){
+        $memberWorkSheetId = self::getMemberWorkSheetId($service, $memberspkey);
+      }
+      $memberMasterSpkey = self::getMemberMasterSpreadSheetKey($service, $memberId); 
+      if(!is_null($memberMasterSpkey)){
+        $memberMasterWorkSheetId = self::getMemberMasterWorkSheetId($service, $memberMasterSpkey);
+      }
+      echo "==== debug info =====\n";
+      echo "Member Id : {$memberId}\n";
+      echo "rawkey: {$rawKey} || rawid:{$wid}\n";
+      echo "Key: {$memberspkey} || WorkSheetId: {$memberWorkSheetId}\n";
+      echo "MasterSpkey: {$memberMasterSpkey} || MasterWorkSheetId: {$memberMasterWorkSheetId}\n";
+      // スプレッドシートで勤怠報告しているメンバーの勤怠を処理する。
+      if(!is_null($memberspkey) && !is_null($memberWorkSheetId)){
+        $previousMonth = date('m') - 1;
+        $year = date('Y');
+        $today = date('d');
+        if(!checkdate($previousMonth, 1, $year)){
+          $previousMonth = 12;
+          $year = $year - 1;
+        }
+        // 先月分の勤怠を処理する。
+        for($i=1;$i<31;$i++){
+          if(checkdate($previousMonth, $i, $year)){
+            $q = new Zend_Gdata_Spreadsheets_ListQuery();
+            $q->setSpreadsheetKey($memberspkey);
+            $q->setWorksheetId($memberWorkSheetId);
+            $query = 'date='.$year.'/'.$previousMonth.'/'.$i;
+            $q->setSpreadsheetQuery($query);
+            $lineList = $service->getListFeed($q);
+            if(!$lineList){
+              continue;
+            }else{
+              foreach($lineList->entries as $entry){
+                $lines = $entry->getCustom();
+                foreach($lines as $line){
+                  $key = $line->getColumnName();
+                  switch($key){
+                    case "date":
+                      $date = $line->getText();
+                    case "ssh":
+                      $ssh = $line->getText();
+                    case "ssm":
+                      $ssm = $line->getText();
+                    case "seh":
+                      $seh = $line->getText();
+                    case "sem":
+                      $sem = $line->getText();
+                    case "srh":
+                      $srh = $line->getText();
+                    case "srm":
+                      $srm = $line->getText();
+                    case "zsh":
+                      $zsh = $line->getText();
+                    case "zsm":
+                      $zsm = $line->getText();
+                    case "zeh":
+                      $zeh = $line->getText();
+                    case "zem":
+                      $zem = $line->getText();
+                    case "zrh":
+                      $zrh = $line->getText();
+                    case "zrm":
+                      $zrm = $line->getText();
+                    default:
+                      // 何もしない。                      
+                  }
+                }
+              }
+              $detail = array('date'=>$date, "ssh"=>$ssh, "ssm"=>$ssm, "seh"=>$seh, "sem"=>$sem, "srh"=>$srh, "srm"=>$srm, "zsh"=>$zsh, "zsm"=>$zsm, "zeh"=>$zeh, "zem"=>$zem, "zrh"=>$zrh, "zrm"=>$zrm);
+              list($date, $ssh, $ssm, $seh, $sem, $srh, $srm, $zsh, $zsm, $zeh, $zem, $zrh, $zrm) = array(null, null, null, null, null, null, null, null, null, null, null, null, null);
+              $r = new Zend_Gdata_Spreadsheets_ListQuery();
+              $r->setSpreadsheetKey($memberMasterSpkey);
+              $r->setWorksheetId($memberMasterWorkSheetId);
+              $query = 'date='.$year.'/'.$previousMonth.'/'.$i;
+              $r->setSpreadsheetQuery($query);
+              $lineList = $service->getListFeed($r);
+              if($lineList){
+                $update = $service->updateRow($lineList->entries['0'], $detail);
+                if($update){ 
+                  echo sprintf("UPDATE SUCCESS!(SpreadSheet) memberId: %s date: %s;\n", $memberId, $detail["date"]);
+                }else{
+                  echo sprintf("ERROR! NO UPDATED.(SpreadSheet) Maybe Internal Server Error Occured on Google Service. memberId: %s date: %s;", $memberId, $detail["date"]);
+                }                 
+              }else{
+                echo sprintf("ERROR! NO UPDATED.(SpreadSheet) Maybe Spreadsheet has been broken. memberId: %s date %s;", $memberId, $detail["date"]);
+              }
             }
-          }
-          $keitai = substr($data, 0, 1);
-          // if($keitai=="S"){ $keitai = "出社"; }else{ $keitai = "在宅"; }
-          $sh = substr($data, 1, 2);
-          $sm = substr($data, 3, 2);
-          $eh = substr($data, 5, 2);
-          $em = substr($data, 7, 2);
-          $rh = floor($rest / 60);
-          $rm = $rest - ( $rh * 60 );
-          $starttime = $sh * 60 + $sm;
-          $endtime = $eh * 60 + $em;
-          $jitsumu = $endtime - $starttime - $rest;
-          $jh = floor($jitsumu / 60);
-          $jm = $jitsumu - $jh * 60;
-          if(strlen($jh)==1){ $jh = "0".$jh; }
-          if(strlen($jm)==1){ $jm = "0".$jm; }
-          if($rh==0){ $rh = "0"; }
-          if($rm==0){ $rm = "0"; }
-          if($keitai=="S"){
-            $details[$d] = array('year' => $y, 'month' => $m, 'date' => $d, 'ssh' => $sh, 'ssm' => $sm, 'seh' => $eh, 'sem' => $em, 'srh' => $rh, 'srm' => $rm, 'sjh' => $jh, 'sjm' => $jm);
-          }
-          if($keitai=="Z"){
-            $details[$d] = array('year' => $y, 'month' => $m, 'date' => $d, 'zsh' => $sh, 'zsm' => $sm, 'zeh' => $eh, 'zem' => $em, 'zrh' => $rh, 'zrm' => $rm, 'zjh' => $jh, 'zjm' => $jm);
-          }
-        }
-
-        $month = date('m');
-        if($m==1 || $m==3 || $m==5 || $m==7 || $m==8 || $m==10 || $m==12){
-          $maxday = 31;
-        }elseif($m==2){
-          if(($year %4 == 0 && $year %100 != 0) || $year %400 == 0)
-            $maxday = 29;
           }else{
-            $maxday = 28;
+            break;
           }
-        }else{
-          $maxday = 30;
         }
 
-        for($i=1;$i<=$maxday;$i++){
-          if(is_null($details[$i])){
-            unset($details[$i]);
-            $details[$i] = array('year' => $y, 'month' => $m, 'date' => $i);
-          }  
+        // 今月分の勤怠を処理する。
+        for($i=1;$i<$today;$i++){
+          if(checkdate(date('m'), $i, date('Y'))){
+            $s = new Zend_Gdata_Spreadsheets_ListQuery();
+            $s->setSpreadsheetKey($memberspkey);
+            $s->setWorksheetId($memberWorkSheetId);
+            $query = 'date='.date('Y').'/'.date('m').'/'.$i;
+            $s->setSpreadsheetQuery($query);
+            $lineList = $service->getListFeed($s);
+            if(!$lineList){
+              continue;
+            }else{
+              foreach($lineList->entries as $entry){
+                $lines = $entry->getCustom();
+                foreach($lines as $line){
+                  $key = $line->getColumnName();
+                  switch($key){
+                    case "date":
+                      $date = $line->getText();
+                    case "ssh":
+                      $ssh = $line->getText();
+                    case "ssm":
+                      $ssm = $line->getText();
+                    case "seh":
+                      $seh = $line->getText();
+                    case "sem":
+                      $sem = $line->getText();
+                    case "srh":
+                      $srh = $line->getText();
+                    case "srm":
+                      $srm = $line->getText();
+                    case "zsh":
+                      $zsh = $line->getText();
+                    case "zsm":
+                      $zsm = $line->getText();
+                    case "zeh":
+                      $zeh = $line->getText();
+                    case "zem":
+                      $zem = $line->getText();
+                    case "zrh":
+                      $zrh = $line->getText();
+                    case "zrm":
+                      $zrm = $line->getText();
+                    default:
+                      // 何もしない。                      
+                  }
+                }
+              }
+                  $detail = array('date'=>$date, "ssh"=>$ssh, "ssm"=>$ssm, "seh"=>$seh, "sem"=>$sem, "srh"=>$srh, "srm"=>$srm, "zsh"=>$zsh, "zsm"=>$zsm, "zeh"=>$zeh, "zem"=>$zem, "zrh"=>$zrh, "zrm"=>$zrm);
+              list($date, $ssh, $ssm, $seh, $sem, $srh, $srm, $zsh, $zsm, $zeh, $zem, $zrh, $zrm) = array(null, null, null, null, null, null, null, null, null, null, null, null, null);
+              $t = new Zend_Gdata_Spreadsheets_ListQuery();
+              $t->setSpreadsheetKey($memberMasterSpkey);
+              $t->setWorksheetId($memberMasterWorkSheetId);
+              $query = 'date='.date('Y').'/'.date('m').'/'.$i;
+              $t->setSpreadsheetQuery($query);
+              $lineList2 = $service->getListFeed($t);
+              if($lineList2){
+                $update = $service->updateRow($lineList2->entries['0'], $detail);
+                if($update){ 
+                  echo sprintf("UPDATE SUCCESS!(SpreadSheet) memberId: %s date: %s;\n", $memberId, $detail["date"]);
+                }else{
+                  echo sprintf("ERROR! NO UPDATED.(SpreadSheet) Maybe Internal Server Error Occured on Google Service. memberId: %s date: %s;", $memberId, $detail["date"]);
+                }                 
+              }else{
+                echo sprintf("ERROR! NO UPDATED.(SpreadSheet) Maybe Spreadsheet has been broken. memberId: %s date %s;", $memberId, $detail["date"]);
+              }
+            }
+          }else{
+            break;
+          }
         }
-        // var_dump($details);
-        foreach($details as $detail){
-          $s = new Zend_Gdata_Spreadsheets_ListQuery();
-          $s->setSpreadsheetkey(opConfig::get('op_kintai_spkey'));
-          $s->setWorkSheetId($config);
-          $query = "year={$detail['year']} and month={$detail['month']} and date={$detail['date']}";
-          $s->setSpreadsheetQuery($query);
-          $lineList = $service->getListFeed($s);
-          $update = $service->updateRow($lineList->entries['0'], $detail);
-          if($update){ echo "Success! member-id : {$memberId}  date: {$detail['year']}/{$detail['month']}/{$detail['date']}\n"; }
+      }elseif(!is_null($memberMasterSpkey) && !is_null($memberMasterWorkSheetId)){
+        $previousMonth = date('m') - 1;
+        $year = date('Y');
+        $today = date('d');
+        if(strlen($previousMonth)==1){
+          $previousMonth = "0".$previousMonth;
         }
-        unset($details);
-        $line_list = null;
-        $line = null;
-        // var_dump($details);
-    
+
+        if(!checkdate($previousMonth, 1, $year)){
+          $previousMonth = 12;
+          $year = $year - 1;
+        }
+
+        // 先月分の勤怠を処理する。
+        for($i=1;$i<31;$i++){
+          if(checkdate($previousMonth, $i, $year)){
+            $j = $i;
+            if(strlen($j)==1){
+              $j = "0".$j;
+            }
+            echo "Scanning: ".$year."/".$previousMonth."/".$j."...";
+            $u = new Zend_Gdata_Spreadsheets_ListQuery();
+            $u->setSpreadsheetKey($rawKey);
+            $u->setWorksheetId($wid);
+            $query = 'id='.$memberId.' and date='.$year.'/'.$previousMonth.'/'.$j;
+            $u->setSpreadsheetQuery($query);
+            $lineList = $service->getListFeed($u);
+            if(!$lineList->entries['0']){
+              echo "skip\n";
+	      continue;
+            }else{
+              foreach($lineList->entries as $entry){
+                $lines = $entry->getCustom();
+                foreach($lines as $line){
+                  $key = $line->getColumnName();
+                  switch($key){
+                    case "date":
+                      $date = $line->getText();
+                    case "data":
+                      $data = $line->getText();
+                    case "comment":
+                      $comment = $line->getText();
+                    default:
+                      // 何もしない。                      
+                  }
+                }
+              }
+
+                if(strlen($data)==12){
+                  $keitai = substr($data, 0, 1);
+                  if($keitai=="S"){
+                    $ssh = substr($data, 1, 2);
+                    $ssm = substr($data, 3, 2);
+                    $seh = substr($data, 5, 2);
+                    $sem = substr($data, 7, 2);
+                    $srest = substr($data, 9, 3);
+                    $srh = floor($srest / 60);
+                    $srm = $srest - ( $srh * 60 );
+                  }else{
+                    $zsh = substr($data, 1, 2);
+                    $zsm = substr($data, 3, 2);
+                    $zeh = substr($data, 5, 2);
+                    $zem = substr($data, 7, 2);
+                    $zrest = substr($data, 9, 3);
+                    $zrh = floor($zrest / 60);
+                    $zrm = $zrest - ( $zrh * 60 );
+                  }
+                }elseif(strlen($data)==24){
+                  $data1 = substr($data, 0, 12);
+                  $data2 = substr($data, 12, 12);
+                  $keitai1 = substr($data1, 0, 1);
+                  if($keitai1=="S"){
+                    $ssh = substr($data1, 1, 2);
+                    $ssm = substr($data1, 3, 2);
+                    $seh = substr($data1, 5, 2);
+                    $sem = substr($data1, 7, 2);
+                    $srest = substr($data1, 9, 3);
+                    $srh = floor($srest / 60);
+                    $srm = $srest - ( $srh * 60 );
+                  }else{
+                    $zsh = substr($data1, 1, 2);
+                    $zsm = substr($data1, 3, 2);
+                    $zeh = substr($data1, 5, 2);
+                    $zem = substr($data1, 7, 2);
+                    $zrest = substr($data1, 9, 3);
+                    $zrh = floor($zrest / 60);
+                    $zrm = $zrest - ( $zrh * 60 );
+                  }
+                  if($keitai2=="S"){
+                    $ssh = substr($data2, 1, 2);
+                    $ssm = substr($data2, 3, 2);
+                    $seh = substr($data2, 5, 2);
+                    $sem = substr($data2, 7, 2);
+                    $srest = substr($data2, 9, 3);
+                    $srh = floor($srest / 60);
+                    $srm = $srest - ( $srh * 60 );
+                  }else{
+                    $zsh = substr($data2, 1, 2);
+                    $zsm = substr($data2, 3, 2);
+                    $zeh = substr($data2, 5, 2);
+                    $zem = substr($data2, 7, 2);
+                    $zrest = substr($data2, 9, 3);
+                    $zrh = floor($zrest / 60);
+                    $zrm = $zrest - ( $zrh * 60 );
+                  }
+                }
+  
+              $detail = array("date"=>$date, "ssh"=>$ssh, "ssm"=>$ssm, "seh"=>$seh, "sem"=>$sem, "srh"=>$srh, "srm"=>$srm, "zsh"=>$zsh, "zsm"=>$zsm, "zeh"=>$zeh, "zem"=>$zem, "zrh"=>$zrh, "zrm"=>$zrm);
+              list($date, $data, $data1, $data2, $keitai, $keitai1, $keitai2, $comment, $ssh, $ssm, $seh, $sem, $srh, $srm, $zsh, $zsm, $zeh, $zem, $zrh, $zrm) = array(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+              $v = new Zend_Gdata_Spreadsheets_ListQuery();
+              $v->setSpreadsheetKey($memberMasterSpkey);
+              $v->setWorksheetId($memberMasterWorkSheetId);
+              $query = 'date='.$year.'/'.$previousMonth.'/'.$i;
+              $v->setSpreadsheetQuery($query);
+              $lineList = $service->getListFeed($v);
+              if($lineList){
+                $update = $service->updateRow($lineList->entries['0'], $detail);
+                if($update){ 
+                  echo sprintf("UPDATE SUCCESS!(OP3-previous-month) memberId: %s date: %s;\n", $memberId, $detail["date"]);
+                }else{
+                  echo sprintf("ERROR! NO UPDATED.(OP3) Maybe Internal Server Error Occured on Google Service. memberId: %s date: %s;", $memberId, $detail["date"]);
+                }                 
+              }else{
+                echo sprintf("ERROR! NO UPDATED. (OP3) Maybe Spreadsheet has been broken. memberId: %s date %s;", $memberId, $detail["date"]);
+              }
+              $date = "";
+            }
+          }else{
+            break;
+          }
+          $detail = array();
+        }
+
+        // 今月の勤怠の処理をする。
+        $today = date('d');
+        for($i=1;$i<$today;$i++){
+          if(checkdate(date('m'), $i, date('Y'))){
+
+            $j = $i;
+            if(strlen($j)==1){
+              $j = "0".$j;
+            }
+            echo "Scanning: ".$year."/".date('m')."/".$j."... ";
+
+            $w = new Zend_Gdata_Spreadsheets_ListQuery();
+            $w->setSpreadsheetKey($rawKey);
+            $w->setWorksheetId($wid);
+            $query = 'id='.$memberId.' and date='.date('Y').'/'.date('m').'/'.$j;
+            $w->setSpreadsheetQuery($query);
+            $lineList = $service->getListFeed($w);
+            if(!$lineList->entries['0']){
+              echo "skip\n";
+              continue;
+            }else{
+              foreach($lineList->entries as $entry){
+                $lines = $entry->getCustom();
+                foreach($lines as $line){
+                  $key = $line->getColumnName();
+                  switch($key){
+                    case "date":
+                      $date = $line->getText();
+                    case "data":
+                      $data = $line->getText();
+                    case "comment":
+                      $comment = $line->getText();
+                    default:
+                      // 何もしない。                      
+                  }
+                }
+              }
+                  if(strlen($data)==12){
+                    $keitai = substr($data, 0, 1);
+                    if($keitai=="S"){
+                      $ssh = substr($data, 1, 2);
+                      $ssm = substr($data, 3, 2);
+                      $seh = substr($data, 5, 2);
+                      $sem = substr($data, 7, 2);
+                      $srest = substr($data, 9, 3);
+                      $srh = floor($srest / 60);
+                      $srm = $srest - ( $srh * 60 );
+                    }else{
+                      $zsh = substr($data, 1, 2);
+                      $zsm = substr($data, 3, 2);
+                      $zeh = substr($data, 5, 2);
+                      $zem = substr($data, 7, 2);
+                      $zrest = substr($data, 9, 3);
+                      $zrh = floor($zrest / 60);
+                      $zrm = $zrest - ( $zrh * 60 );
+                    }
+                  }elseif(strlen($data)==24){
+                    $data1 = substr($data, 0, 12);
+                    $data2 = substr($data, 12, 12);
+                    $keitai1 = substr($data1, 0, 1);
+                    if($keitai1=="S"){
+                      $ssh = substr($data1, 1, 2);
+                      $ssm = substr($data1, 3, 2);
+                      $seh = substr($data1, 5, 2);
+                      $sem = substr($data1, 7, 2);
+                      $srest = substr($data1, 9, 3);
+                      $srh = floor($srest / 60);
+                      $srm = $srest - ( $srh * 60 );
+                    }else{
+                      $zsh = substr($data1, 1, 2);
+                      $zsm = substr($data1, 3, 2);
+                      $zeh = substr($data1, 5, 2);
+                      $zem = substr($data1, 7, 2);
+                      $zrest = substr($data1, 9, 3);
+                      $zrh = floor($zrest / 60);
+                      $zrm = $zrest - ( $zrh * 60 );
+                    }
+                    if($keitai2=="S"){
+                      $ssh = substr($data2, 1, 2);
+                      $ssm = substr($data2, 3, 2);
+                      $seh = substr($data2, 5, 2);
+                      $sem = substr($data2, 7, 2);
+                      $srest = substr($data2, 9, 3);
+                      $srh = floor($srest / 60);
+                      $srm = $srest - ( $srh * 60 );
+                    }else{
+                      $zsh = substr($data2, 1, 2);
+                      $zsm = substr($data2, 3, 2);
+                      $zeh = substr($data2, 5, 2);
+                      $zem = substr($data2, 7, 2);
+                      $zrest = substr($data2, 9, 3);
+                      $zrh = floor($zrest / 60);
+                      $zrm = $zrest - ( $zrh * 60 );
+                    }
+                  }
+              $detail = array("date"=>$date, "ssh"=>$ssh, "ssm"=>$ssm, "seh"=>$seh, "sem"=>$sem, "srh"=>$srh, "srm"=>$srm, "zsh"=>$zsh, "zsm"=>$zsm, "zeh"=>$zeh, "zem"=>$zem, "zrh"=>$zrh, "zrm"=>$zrm);
+              // 変数を一括初期化。
+              list($date, $data, $data1, $data2, $keitai, $keitai1, $keitai2, $comment, $ssh, $ssm, $seh, $sem, $srh, $srm, $zsh, $zsm, $zeh, $zem, $zrh, $zrm) = array(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+
+              $x = new Zend_Gdata_Spreadsheets_ListQuery();
+              $x->setSpreadsheetKey($memberMasterSpkey);
+              $x->setWorksheetId($memberMasterWorkSheetId);
+              $query = 'date='.date('Y').'/'.date('m').'/'.$i;
+              $x->setSpreadsheetQuery($query);
+              $lineList = $service->getListFeed($x);
+              if($lineList){
+                $update = $service->updateRow($lineList->entries['0'], $detail);
+                if($update){ 
+                  echo sprintf("UPDATE SUCCESS! (OP3) memberId: %s date: %s;\n", $memberId, $detail["date"]);
+                }else{
+                  echo sprintf("ERROR! NO UPDATED. (OP3) Maybe Internal Server Error Occured on Google Service. memberId: %s date: %s;", $memberId, $detail["date"]);
+                }                 
+              }else{
+                echo sprintf("ERROR! NO UPDATED. (OP3) Maybe Spreadsheet has been broken. memberId: %s date %s;", $memberId, $detail["date"]);
+              }
+            }
+          }else{
+            break;
+          }
+          $detail = array();
+        } 
+      }
     }
   }
 
@@ -122,14 +454,31 @@ class PostKintaiTask extends sfBaseTask
     return new Zend_Gdata_Spreadsheets($client);
   }
 
-  private function getMemberWorkSheetId($memberId){
-    $service = self::getZendGdata();
+  private function getMemberSpreadSheetKey($service, $memberId){
     $member = Doctrine::getTable('Member')->find($memberId);
     $memberEmailAddress = $member->getEmailAddress(false);
-    $memberEmailAddressUserName  = explode("@", $memberEmailAddress);
-    $worksheetname = $memberEmailAddressUserName[0];
+    $spreadsheetname = $memberEmailAddress."-kintai";
+    $feed = $service->getSpreadsheetFeed();
+    $i = 0;
+    foreach($feed->entries as $entry) {
+      if($entry->title->text===$spreadsheetname) {
+        $aKey = split('/', $feed->entries[$i]->id->text);
+        $SpreadsheetKey = $aKey[5];
+        break;
+      }
+      $i++;
+    }
+    if($SpreadsheetKey){
+      return $SpreadsheetKey;
+    }else{
+      return null;
+    }
+  }
+
+  private function getMemberWorkSheetId($service, $spreadsheetKey){
+    $worksheetname = "勤怠明細";
     $DocumentQuery = new Zend_Gdata_Spreadsheets_DocumentQuery();
-    $DocumentQuery->setSpreadsheetKey(opConfig::get('op_kintai_spkey'));
+    $DocumentQuery->setSpreadsheetKey($spreadsheetKey);
     $SpreadsheetFeed = $service->getWorksheetFeed($DocumentQuery);
     $i = 0;
     foreach($SpreadsheetFeed->entries as $WorksheetEntry) {
@@ -143,11 +492,48 @@ class PostKintaiTask extends sfBaseTask
     return $WorksheetId;
   }
 
-  private function getRowId(){
-    $service = self::getZendGdata();
+  private function getMemberMasterSpreadSheetKey($service, $memberId){
+    $member = Doctrine::getTable('Member')->find($memberId);
+    $memberEmailAddress = $member->getEmailAddress(false);
+    $spreadsheetname = "(Master) ".$memberEmailAddress."-kintai";
+    $feed = $service->getSpreadsheetFeed();
+    $i = 0;
+    foreach($feed->entries as $entry) {
+      if( $entry->title->text===$spreadsheetname) {
+        $aKey = split('/', $feed->entries[$i]->id->text);
+        $SpreadsheetKey = $aKey[5];
+        break;
+      }
+      $i++;
+    }
+    if($SpreadsheetKey){
+      return $SpreadsheetKey;
+    }else{
+      return null;
+    }
+  } 
+
+  private function getMemberMasterWorkSheetId($service, $spreadsheetKey){
+    $worksheetname = "勤怠明細";
+    $DocumentQuery = new Zend_Gdata_Spreadsheets_DocumentQuery();
+    $DocumentQuery->setSpreadsheetKey($spreadsheetKey);
+    $SpreadsheetFeed = $service->getWorksheetFeed($DocumentQuery);
+    $i = 0;
+    foreach($SpreadsheetFeed->entries as $WorksheetEntry) {
+      $worksheetId = split('/', $SpreadsheetFeed->entries[$i]->id->text);
+      if($WorksheetEntry->title->text===$worksheetname){
+         $WorksheetId = $worksheetId[8];
+         break;
+      }
+      $i++;
+    }
+    return $WorksheetId;
+  } 
+
+  private function getRowId($service, $spreadsheetKey){
     $worksheetname = "RAW";
     $DocumentQuery = new Zend_Gdata_Spreadsheets_DocumentQuery();
-    $DocumentQuery->setSpreadsheetKey(opConfig::get('op_kintai_spkey'));
+    $DocumentQuery->setSpreadsheetKey($spreadsheetKey);
     $SpreadsheetFeed = $service->getWorksheetFeed($DocumentQuery);
     $i = 0;
     foreach($SpreadsheetFeed->entries as $WorksheetEntry) {
@@ -161,6 +547,12 @@ class PostKintaiTask extends sfBaseTask
     return $WorksheetId;
   }
 
+  private function getPastDay($day){
+    $start = "2011/01/01";
+    $diff = strtotime($day) - strtotime($start);
+    $diffday = $diff / ( 3600 * 24 );
+    return $diffday;
+  }
 }
 
 
