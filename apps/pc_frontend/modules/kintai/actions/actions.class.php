@@ -70,7 +70,7 @@ class kintaiActions extends sfActions
     }
     $this->data = $data;
     $this->currentMember = $this->getUser()->getMember()->getId();
-    $this->viewmember = $member_id;
+    $this->viewMember = $member_id;
     //$this->allowdate = opConfig::get('op_kintai_allowdate', '3');
     return sfView::SUCCESS;
   }
