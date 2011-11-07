@@ -1,4 +1,4 @@
-<div class="partsHeading"><h3><?php echo $member_name; ?>さんの勤怠( <?php echo $year; ?>年<?php echo $month; ?>月)</h3></div>
+<div class="partsHeading"><h3><?php echo $member_name; ?>さんの勤怠</h3></div>
 <div class="block">
 <?php if(is_null($member_editablelink) && $currentMember==$viewMember) : ?>
 
