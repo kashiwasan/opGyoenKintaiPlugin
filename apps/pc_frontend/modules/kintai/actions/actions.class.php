@@ -61,10 +61,15 @@ class kintaiActions extends sfActions
     }
     
     $memberSpreadSheetKey = self::getMemberMasterSpreadSheetKey($service, $member_id);
-    $this->member_splink = "https://spreadsheets.google.com/ccc?key=".$memberSpreadSheetKey."&hl=ja";
+    $domain = null;
+    if (!is_null(opConfig::get('op_kintai_apps_domain', null)))
+    {
+      $domain = 'a/'.opConfig::get('op_kintai_apps_domain').'/';
+    }
+    $this->member_splink = "https://docs.google.com/".$domain."spreadsheet/ccc?key=".$memberSpreadSheetKey."&hl=ja";
     $memberEditableKey = self::getMemberSpreadSheetKey($service, $member_id);
     if(!is_null($memberEditableKey)){
-      $this->member_editablelink = "https://spreadsheets.google.com/ccc?key=".$memberEditableKey."&hl=ja";
+      $this->member_editablelink = "https://docs.google.com/".$domain."spreadsheet/cc?key=".$memberEditableKey."&hl=ja";
     }else{
       $this->member_editablelink = null;
     }
