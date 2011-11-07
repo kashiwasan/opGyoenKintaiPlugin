@@ -78,7 +78,7 @@ class kintaiActions extends sfActions
     $memberEditableKey = self::getMemberSpreadSheetKey($service, $member_id);
     if (!is_null($memberEditableKey))
     {
-      $this->member_editablelink = "https://docs.google.com/".$domain."spreadsheet/cc?key=".$memberEditableKey."&hl=ja";
+      $this->member_editablelink = "https://docs.google.com/".$domain."spreadsheet/ccc?key=".$memberEditableKey."&hl=ja";
     }
     else
     {
