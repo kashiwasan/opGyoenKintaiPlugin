@@ -30,9 +30,9 @@ echo($htmls);
 <?php if(!is_null($member_editablelink) && $currentMember==$viewMember) : ?>
 【社員さん用編集リンク】<br />
 以下のURLより直接編集可能です。<br />
-<a href="<?php echo $member_editablelink; ?>" target="_blank"><?php echo $member_editablelink?></a><br /><br />
+<a href="<?php echo $member_editablelink; ?>" target="_blank">勤怠を編集する</a><br /><br />
 <?php endif; ?>
 <?php echo $member_name; ?> さんの勤怠明細（スプレッドシート）はこちらです。<br />
-<a href="<?php echo $member_splink; ?>" target="_blank"><?php echo $member_splink; ?></a>
+<a href="<?php echo $member_splink; ?>" target="_blank">勤怠を閲覧する</a>
 <br /><br />
 </div>
