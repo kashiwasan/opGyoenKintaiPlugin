@@ -36,6 +36,11 @@ OpenPNE3上で勤怠管理ができるようにする。
 生データをメンバーのワークシートに整形出力するコマンドは
 ./symfony opKintai:execute
 
+メンバーIDの範囲を指定してタスクを実行することもできます。
+./symfony opKintai:execute --start-member-id=1 --end-member-id=10
+とすると、メンバーID１〜１０の間でスキャンが実行されます。
+※start-member-idを実行しない場合は１、end-member-idを指定しない場合はSNSメンバーの最大IDまでの範囲で実行されます。
+
 勤怠報告をアクティビティに投稿して促すコマンドは
 (朝)
 ./symfony opKintai:notify morning
