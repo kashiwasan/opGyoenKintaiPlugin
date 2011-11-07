@@ -29,16 +29,21 @@ class kintaiActions extends sfActions
     $service = self::getZendGdata();
     $Id = $this->getRequestParameter('id');
     $member_id = isset($Id) ? $Id : $this->getUser()->getMemberId();
-    $MemberS = Doctrine::getTable('Member')->find($member_id);
-    if(!$MemberS){ return sfView::ERROR; }
-    if ($member_id !== $this->getUser()->getMemberId()){
+    $memberS = Doctrine::getTable('Member')->find($member_id);
+    if (!$memberS)
+    {
+      return sfView::ERROR;
+    }
+    if ($member_id !== $this->getUser()->getMemberId())
+    {
       sfConfig::set('sf_nav_type', 'friend');
       sfConfig::set('sf_nav_id', $member_id);
     }
-    $this->member_name = $MemberS->getName();
+    $this->member_name = $memberS->getName();
     $wid = self::getRowId($service);
 
-    for($i=0;$i<3;$i++){
+    for ($i=0;$i<3;$i++)
+    {
       if($i==0){
         $date = date('Y/m/d', strtotime('now'));
       }elseif($i==1){
@@ -53,9 +58,12 @@ class kintaiActions extends sfActions
       $query = "id={$member_id} and date={$date}";
       $q->setSpreadsheetQuery($query);
       $line = $service->getListFeed($q);
-      if($line->entries["0"]){
+      if ($line->entries["0"])
+      {
         $data[]= array('date'=> $date, 'flg' => 1,);
-      }else{
+      }
+      else
+      {
         $data[]= array('date'=> $date, 'flg' => 0,);
       }
     }
@@ -68,15 +76,17 @@ class kintaiActions extends sfActions
     }
     $this->member_splink = "https://docs.google.com/".$domain."spreadsheet/ccc?key=".$memberSpreadSheetKey."&hl=ja";
     $memberEditableKey = self::getMemberSpreadSheetKey($service, $member_id);
-    if(!is_null($memberEditableKey)){
+    if (!is_null($memberEditableKey))
+    {
       $this->member_editablelink = "https://docs.google.com/".$domain."spreadsheet/cc?key=".$memberEditableKey."&hl=ja";
-    }else{
+    }
+    else
+    {
       $this->member_editablelink = null;
     }
     $this->data = $data;
     $this->currentMember = $this->getUser()->getMemberId();
     $this->viewMember = $member_id;
-    //$this->allowdate = opConfig::get('op_kintai_allowdate', '3');
     return sfView::SUCCESS;
   }
 
@@ -89,18 +99,27 @@ class kintaiActions extends sfActions
   {
     $service = self::getZendGdata();
     $wid = self::getRowId($service);
-    if($request->isMethod(sfWebRequest::POST)){
+    if ($request->isMethod(sfWebRequest::POST))
+    {
       //Definition
       $memberId = $this->getUser()->getMemberId();
       $y = $request->getParameter('y');
-      if(empty($y)){ $y = date('Y'); }
+      if (empty($y))
+      {
+        $y = date('Y');
+      }
       $m = $request->getParameter('m');
-      if(empty($m)){ $m = date('m'); }
+      if (empty($m))
+      {
+        $m = date('m');
+      }
       $d = $request->getParameter('d');
-      if(empty($d)){ $d = date('d'); }
+      if (empty($d))
+      {
+        $d = date('d');
+      }
       $data = $request->getParameter('data');
       $comment = $request->getParameter('comment');
-
       $keitai = substr($data, 0, 1);
       $start = array();
       $end = array();
@@ -111,12 +130,14 @@ class kintaiActions extends sfActions
       $start["time"] = $start["hour"] * 60 + $start["minute"];
       $end["time"] = $end["hour"] * 60 + $end["minute"];
       $rest = substr($data, 9, 3);
-      if(substr($rest, 0, 1)=="0"){
+      if (substr($rest, 0, 1)=="0")
+      {
         $rest = substr($rest, 1, 2);
       }
       $jitsumu = $end["time"] - $start["time"] - $rest;
       
-      if(strlen($data)==24){ 
+      if (strlen($data)==24)
+      { 
         $keitai2 = substr($data, 12, 1);
         $start2["hour"]= substr($data, 13, 2);
         $start2["minute"] = substr($data, 15, 2);
@@ -125,7 +146,8 @@ class kintaiActions extends sfActions
         $start2["time"] = $start2["hour"] * 60 + $start2["minute"];
         $end2["time"] = $end2["hour"] * 60 + $end2["minute"];
         $rest2 = substr($data, 21, 3);
-        if(substr($rest2, 0, 1)=="0"){
+        if (substr($rest2, 0, 1)=="0")
+        {
           $rest2 = substr($rest2, 1, 2);
         }
         $jitsumu2 = $end2["time"] - $start2["time"] - $rest2;
@@ -133,45 +155,59 @@ class kintaiActions extends sfActions
 
       //Validation
       $message = null;
-      if(strlen($data)!=12 && strlen($data)!=24){
+      if (strlen($data)!=12 && strlen($data)!=24)
+      {
         $message.= "入力が不正です。<br />";
       }
-      if(!preg_match("/^[0-2][0-9]$/", $start["hour"]) || !preg_match("/^[0-5][0-9]$/", $start["minute"])){
+      if (!preg_match("/^[0-2][0-9]$/", $start["hour"]) || !preg_match("/^[0-5][0-9]$/", $start["minute"]))
+      {
         $message.= "始業時間の入力が誤っています。<br />";
       }
-      if(!preg_match("/^[0-2][0-9]$/", $end["hour"]) || !preg_match("/^[0-5][0-9]$/", $end["minute"])){
+      if (!preg_match("/^[0-2][0-9]$/", $end["hour"]) || !preg_match("/^[0-5][0-9]$/", $end["minute"]))
+      {
         $message.= "終業時間の入力が誤っています。<br />";
       }
-      if($jitsumu<=0){
+      if ($jitsumu<=0)
+      {
         $message.= "実務時間が0分となってしまいます。入力を見なおしてください。<br />";
       } 
-      if(!preg_match("/^\d{2,3}$/", $rest)){
+      if (!preg_match("/^\d{2,3}$/", $rest))
+      {
         $message.= "休憩時間の入力が誤っています。<br />";
       }
-      if($keitai!="S" && $keitai!="Z"){
+      if ($keitai!="S" && $keitai!="Z")
+      {
         $message.= "勤務種別の入力が誤っています。<br />";
       }
  
-      if(!$comment){
+      if (!$comment)
+      {
         $message.= 'コメントがありません。<br />';
       }
-      if(strlen($data)==24){
-        if(isset($keitai) && isset($keitai2) && $keitai==$keitai2){
+      if (strlen($data)==24)
+      {
+        if (isset($keitai) && isset($keitai2) && $keitai==$keitai2)
+        {
           $message.= "同じ業務種別です。(2)";
         }
-        if(!preg_match("/^[0-2][0-9]$/", $start2["hour"]) || !preg_match("/^[0-5][0-9]$/", $start2["minute"])){
+        if (!preg_match("/^[0-2][0-9]$/", $start2["hour"]) || !preg_match("/^[0-5][0-9]$/", $start2["minute"]))
+        {
           $message.= "始業時間の入力が誤っています。(2)<br />";
         }
-        if(!preg_match("/^[0-2][0-9]$/", $end2["hour"]) || !preg_match("/^[0-5][0-9]$/", $end2["minute"])){
+        if (!preg_match("/^[0-2][0-9]$/", $end2["hour"]) || !preg_match("/^[0-5][0-9]$/", $end2["minute"]))
+        {
           $message.= "終業時間の入力が誤っています。(2)<br />";
         }
-        if($jitsumu<=0){
+        if ($jitsumu<=0)
+        {
           $message.= "実務時間が0分となってしまいます。入力を見なおしてください。(2)<br />";
         } 
-        if(!preg_match("/^\d{2,3}$/", $rest2)){
+        if (!preg_match("/^\d{2,3}$/", $rest2))
+        {
           $message.= "休憩時間の入力が誤っています。(2)<br />";
         }  
-        if($keitai2!="S" && $keitai2!="Z"){
+        if ($keitai2!="S" && $keitai2!="Z")
+        {
           $message.= "勤務種別の入力が誤っています。(2)<br />";
         }
       }
@@ -180,11 +216,13 @@ class kintaiActions extends sfActions
       $nowtime = time();
       $pasttime = $unixtime - $nowtime;
       $allowtime = opConfig::get('op_kintai_allowdate', '3');
-      if($pasttime>$allowtime){
-         $message.= "勤怠の登録期限がすでに過ぎてしまっています。<br />";
+      if ($pasttime>$allowtime)
+      {
+        $message.= "勤怠の登録期限がすでに過ぎてしまっています。<br />";
       }
 
-      if(!$message){
+      if (!$message)
+      {
         $q = new Zend_Gdata_Spreadsheets_ListQuery();
         $q->setSpreadsheetKey(opConfig::get('op_kintai_spkey', null));
         $q->setWorksheetId($wid);
@@ -192,15 +230,18 @@ class kintaiActions extends sfActions
         $q->setSpreadsheetQuery($query);
         $line = $service->getListFeed($q);
 
-        if($line->entries["0"]){
+        if ($line->entries["0"])
+        {
           $message.= "この種別の勤怠はすでに登録済みです。<br />";
         }
       }
 
-      if($message)
+      if ($message)
       {
         $arr = array('status' => 'err', 'msg' => $message);
-      }else{
+      }
+      else
+      {
         $ymdhis = "{$y}/{$m}/{$d}";
         $rowData = array(
           'id' => $memberId,
@@ -210,26 +251,41 @@ class kintaiActions extends sfActions
           );
         $arr = array();
         $spdata = $service->insertRow($rowData, opConfig::get('op_kintai_spkey', null), $wid);
-        if($spdata){
+        if ($spdata)
+        {
           $arr = array('status' => 'ok', 'msg' => '勤怠を保存しました。お疲れ様です。');
-        }else{
+        }
+        else
+        {
           $arr = array('status' => 'err2', 'msg' => '通信エラーです。（スプレッドシートサーバーと通信ができませんでした。）');
         }
       }
       return $this->renderText(json_encode($arr));
-    }else{
+    }
+    else
+    {
       $this->redirect('kintai');
       exit;
     }
   }
-  public function executeAjaxRegist(sfWebRequest $request){
+  public function executeAjaxRegist(sfWebRequest $request)
+  {
     $this->nickname = $this->getUser()->getMember()->getName();
     $y = $request->getParameter('y');
-      if(empty($y)){ $y = date('Y'); }
+    if (empty($y))
+    {
+      $y = date('Y');
+    }
     $m = $request->getParameter('m');
-      if(empty($m)){ $m = date('m'); }
+    if(empty($m))
+    {
+      $m = date('m');
+    }
     $d = $request->getParameter('d');
-      if(empty($d)){ $d = date('d'); }
+    if (empty($d))
+    {
+      $d = date('d');
+    }
 
     $this->data = $request->getParameter('keitai').$request->getParameter('sh').$request->getparameter('sm').$request->getparameter('eh').$request->getParameter('em');
     $this->rest = $request->getParameter('rest');
@@ -243,14 +299,24 @@ class kintaiActions extends sfActions
   }
 
 
-  public function executeAjaxRegistEasy(sfWebRequest $request){
+  public function executeAjaxRegistEasy(sfWebRequest $request)
+  {
     $this->nickname = $this->getUser()->getMember()->getName();
     $y = $request->getParameter('y');
-      if(empty($y)){ $y = date('Y'); }
+    if (empty($y))
+    {
+      $y = date('Y');
+    }
     $m = $request->getParameter('m');
-      if(empty($m)){ $m = date('m'); }
+    if (empty($m))
+    {
+      $m = date('m');
+    }
     $d = $request->getParameter('d');
-      if(empty($d)){ $d = date('d'); }
+    if (empty($d))
+    {
+      $d = date('d');
+    }
     $this->y = $y;
     $this->m = $m;
     $this->d = $d;
@@ -259,7 +325,8 @@ class kintaiActions extends sfActions
   }
 
 
-  public function executeAjaxEdit(sfWebRequest $request){
+  public function executeAjaxEdit(sfWebRequest $request)
+  {
     $memberId = $this->getUser()->getMemberId();
     $member_name = $this->getUser()->getMember()->getName();
     $y = $request->getParameter('y');
@@ -274,12 +341,17 @@ class kintaiActions extends sfActions
     $q->setSpreadsheetQuery($query);
 
     $listFeed = $service->getListFeed($q);
-    if(!$listFeed->entries["0"]){
+    if(!$listFeed->entries["0"])
+    {
       return $this->renderText("この日の勤怠は存在しないか、既に編集不可能です。");
-    }else{
-      foreach($listFeed->entries as $entry){
+    }
+    else
+    {
+      foreach ($listFeed->entries as $entry)
+      {
         $line_list = $entry->getCustom();
-        foreach($line_list as $line){
+        foreach ($line_list as $line)
+        {
           $key = $line->getColumnName();
           switch($key){
             case "data":
@@ -301,10 +373,12 @@ class kintaiActions extends sfActions
     }
   }
 
-  public function executeAjaxSend(sfWebRequest $request){
+  public function executeAjaxSend(sfWebRequest $request)
+  {
     $service = self::getZendGdata();
     $wid = self::getRowId($service);
-    if($request->isMethod(sfWebRequest::POST)){
+    if ($request->isMethod(sfWebRequest::POST))
+    {
       $y = $request->getParameter('y');
       $m = $request->getParameter('m');
       $d = $request->getParameter('d');
@@ -323,7 +397,8 @@ class kintaiActions extends sfActions
       $rest = substr($data, 9 , 3);
       $jitsumu = $end["time"] - $start["time"] - $rest;
 
-      if(strlen($data)==24){ 
+      if (strlen($data)==24)
+      { 
         $start2["hour"]= substr($data, 12, 2);
         $start2["minute"] = substr($data, 14, 2);
         $end2["hour"] = substr($data, 16, 2);
@@ -331,7 +406,8 @@ class kintaiActions extends sfActions
         $start2["time"] = $start2["hour"] * 60 + $start2["minute"];
         $end2["time"] = $end2["hour"] * 60 + $end2["minute"];
         $rest2 = substr($data, 20, 3);
-        if(substr($rest2, 0, 1)=="0"){
+        if (substr($rest2, 0, 1)=="0")
+        {
           $rest2 = substr($rest2, 1, 2);
         }
         $jitsumu2 = $end2["time"] - $start2["time"] - $rest2;
@@ -339,46 +415,60 @@ class kintaiActions extends sfActions
       
       //Validation
       $message = null;
-      if(strlen($data)!=12 && strlen($data)!=24){
+      if (strlen($data)!=12 && strlen($data)!=24)
+      {
         $message.= "入力が不正です。<br />";
       }
-      if(!preg_match("/^[0-2][0-9]$/", $start["hour"]) || !preg_match("/^[0-5][0-9]$/", $start["minute"])){
+      if (!preg_match("/^[0-2][0-9]$/", $start["hour"]) || !preg_match("/^[0-5][0-9]$/", $start["minute"]))
+      {
         $message.= "始業時間の入力が誤っています。<br />";
       }
-      if(!preg_match("/^[0-2][0-9]$/", $end["hour"]) || !preg_match("/^[0-5][0-9]$/", $end["minute"])){
+      if (!preg_match("/^[0-2][0-9]$/", $end["hour"]) || !preg_match("/^[0-5][0-9]$/", $end["minute"]))
+      {
         $message.= "終業時間の入力が誤っています。<br />";
       }
-      if($jitsumu<=0){
+      if ($jitsumu<=0)
+      {
         $message.= "実務時間が0分となってしまいます。入力を見なおしてください。<br />";
       } 
-      if(!preg_match("/^\d{2,3}$/", $rest)){
+      if (!preg_match("/^\d{2,3}$/", $rest))
+      {
         $message.= "休憩時間の入力が誤っています。<br />";
       }
-      if($keitai!="S" && $keitai!="Z"){
+      if ($keitai!="S" && $keitai!="Z")
+      {
         $message.= "勤務種別の入力が誤っています。<br />";
       }
  
-      if(!$comment){
+      if (!$comment)
+      {
         $message.= 'コメントがありません。<br />';
       }
-      if(strlen($data)==24){
-        if(isset($keitai) && isset($keitai2) && $keitai==$keitai2){
+      if (strlen($data)==24)
+      {
+        if (isset($keitai) && isset($keitai2) && $keitai==$keitai2)
+        {
           $message.= "同じ業務種別です。<br />";
         }
 
-        if(!preg_match("/^[0-2][0-9]$/", $start2["hour"]) || !preg_match("/^[0-5][0-9]$/", $start2["minute"])){
+        if (!preg_match("/^[0-2][0-9]$/", $start2["hour"]) || !preg_match("/^[0-5][0-9]$/", $start2["minute"]))
+        {
           $message.= "始業時間の入力が誤っています。<br />";
         }
-        if(!preg_match("/^[0-2][0-9]$/", $end2["hour"]) || !preg_match("/^[0-5][0-9]$/", $end2["minute"])){
+        if (!preg_match("/^[0-2][0-9]$/", $end2["hour"]) || !preg_match("/^[0-5][0-9]$/", $end2["minute"]))
+        {
           $message.= "終業時間の入力が誤っています。<br />";
         }
-        if($jitsumu<=0){
+        if ($jitsumu<=0)
+        {
           $message.= "実務時間が0分となってしまいます。入力を見なおしてください。<br />";
         }   
-        if(!preg_match("/^\d{2,3}$/", $rest2)){
+        if (!preg_match("/^\d{2,3}$/", $rest2))
+        {
           $message.= "休憩時間の入力が誤っています。<br />";
         }
-        if($keitai2!="S" && $keitai2!="Z"){
+        if ($keitai2!="S" && $keitai2!="Z")
+        {
           $message.= "同じ勤務種別は入力できません。<br />";
         }
       }
@@ -389,22 +479,28 @@ class kintaiActions extends sfActions
       $q->setSpreadsheetQuery($query);
       $line = $service->getListFeed($q);
 
-      if(!$line->entries["0"]){
+      if (!$line->entries["0"])
+      {
         $message.= '編集しようとした勤怠は存在しませんでした。<br />';
-      }else{
-          $nowtime = time();
-          $unixtime = mktime(0, 0, 0, $m, $d, $y);
-          $pasttime = $nowtime - $unixtime;
-          $allowtime = opConfig::get('op_kintai_allowdate', '3') * 24 * 60 * 60;
-          if($pasttime > $allowtime){   // 259200 = 3 * 24 * 60 * 60
+      }
+      else
+      {
+        $nowtime = time();
+        $unixtime = mktime(0, 0, 0, $m, $d, $y);
+        $pasttime = $nowtime - $unixtime;
+        $allowtime = opConfig::get('op_kintai_allowdate', '3') * 24 * 60 * 60;
+        if ($pasttime > $allowtime)
+        {   // 259200 = 3 * 24 * 60 * 60
             $message.= "この勤怠はすでに編集不可となっています。<br />";
-          }
+        }
       }
 
-      if($message)
+      if ($message)
       {
         $arr = array('status' => 'err', 'msg' => $message);
-      }else{
+      }
+      else
+      {
         $ymdhis = "{$y}/{$m}/{$d}";
         $rowData = array(
           'id' => $memberId,
@@ -414,14 +510,19 @@ class kintaiActions extends sfActions
         );
         $arr = array();
         $spdata = $service->updateRow($line->entries['0'], $rowData);
-        if($spdata){
+        if ($spdata)
+        {
           $arr = array('status' => 'ok', 'msg' => '勤怠を編集しました。<br />');
-        }else{
+        }
+        else
+        {
           $arr = array('status' => 'err2', 'msg' => '通信エラーです。（スプレッドシートサーバーと通信ができませんでした。）');
         }
       }
       return $this->renderText(json_encode($arr));
-    }else{
+    }
+    else
+    {
       return $this->renderText("Error: POSTリクエストで送信されなかった為、処理を中断しました。");
     }
   }
@@ -435,97 +536,116 @@ class kintaiActions extends sfActions
     return new Zend_Gdata_Spreadsheets($client);
   } 
 
-  private function getMemberSpreadSheetKey($service, $memberId){
+  private function getMemberSpreadSheetKey($service, $memberId)
+  {
     $member = Doctrine::getTable('Member')->find($memberId);
     $memberEmailAddress = $member->getEmailAddress(false);
     $spreadsheetname = $memberEmailAddress."-kintai";
     $feed = $service->getSpreadsheetFeed();
     $i = 0;
-    foreach($feed->entries as $entry) {
-      if($entry->title->text===$spreadsheetname) {
+    foreach ($feed->entries as $entry)
+    {
+      if ($entry->title->text===$spreadsheetname)
+      {
         $aKey = split('/', $feed->entries[$i]->id->text);
         $SpreadsheetKey = $aKey[5];
         break;
       }
       $i++;
     }
-    if($SpreadsheetKey){
+    if ($SpreadsheetKey)
+    {
       return $SpreadsheetKey;
-    }else{
+    }
+    else
+    {
       return null;
     }
   }
 
-  private function getMemberWorkSheetId($service, $spreadsheetKey){
+  private function getMemberWorkSheetId($service, $spreadsheetKey)
+  {
     $worksheetname = "勤怠明細";
-    $DocumentQuery = new Zend_Gdata_Spreadsheets_DocumentQuery();
-    $DocumentQuery->setSpreadsheetKey($spreadsheetKey);
-    $SpreadsheetFeed = $service->getWorksheetFeed($DocumentQuery);
+    $documentQuery = new Zend_Gdata_Spreadsheets_DocumentQuery();
+    $documentQuery->setSpreadsheetKey($spreadsheetKey);
+    $spreadsheetFeed = $service->getWorksheetFeed($documentQuery);
     $i = 0;
-    foreach($SpreadsheetFeed->entries as $WorksheetEntry) {
-      $worksheetId = split('/', $SpreadsheetFeed->entries[$i]->id->text);
-      if($WorksheetEntry->title->text===$worksheetname){
-         $WorksheetId = $worksheetId[8];
+    foreach ($spreadsheetFeed->entries as $worksheetEntry)
+    {
+      $worksheetIds = split('/', $spreadsheetFeed->entries[$i]->id->text);
+      if ($worksheetEntry->title->text===$worksheetname)
+      {
+         $worksheetId = $worksheetIds[8];
          break;
       }
       $i++;
     }
-    return $WorksheetId;
+    return $worksheetId;
   }
 
-  private function getMemberMasterSpreadSheetKey($service, $memberId){
+  private function getMemberMasterSpreadSheetKey($service, $memberId)
+  {
     $member = Doctrine::getTable('Member')->find($memberId);
     $memberEmailAddress = $member->getEmailAddress(false);
     $spreadsheetname = "(Master) ".$memberEmailAddress."-kintai";
     $feed = $service->getSpreadsheetFeed();
     $i = 0;
-    foreach($feed->entries as $entry) {
-      if( $entry->title->text===$spreadsheetname) {
+    foreach ($feed->entries as $entry)
+    {
+      if ($entry->title->text===$spreadsheetname)
+      {
         $aKey = split('/', $feed->entries[$i]->id->text);
-        $SpreadsheetKey = $aKey[5];
+        $spreadsheetKey = $aKey[5];
         break;
       }
       $i++;
     }
-    if($SpreadsheetKey){
-      return $SpreadsheetKey;
-    }else{
+    if ($spreadsheetKey)
+    {
+      return $spreadsheetKey;
+    }
+    else
+    {
       return null;
     }
   }
 
-  private function getMemberMasterWorkSheetId($service, $spreadsheetKey){
+  private function getMemberMasterWorkSheetId($service, $spreadsheetKey)
+  {
     $worksheetname = "勤怠明細";
-    $DocumentQuery = new Zend_Gdata_Spreadsheets_DocumentQuery();
-    $DocumentQuery->setSpreadsheetKey($spreadsheetKey);
-    $SpreadsheetFeed = $service->getWorksheetFeed($DocumentQuery);
+    $documentQuery = new Zend_Gdata_Spreadsheets_DocumentQuery();
+    $documentQuery->setSpreadsheetKey($spreadsheetKey);
+    $spreadsheetFeed = $service->getWorksheetFeed($documentQuery);
     $i = 0;
-    foreach($SpreadsheetFeed->entries as $WorksheetEntry) {
-      $worksheetId = split('/', $SpreadsheetFeed->entries[$i]->id->text);
-      if($WorksheetEntry->title->text===$worksheetname){
-         $WorksheetId = $worksheetId[8];
+    foreach ($spreadsheetFeed->entries as $worksheetEntry)
+    {
+      $worksheetIds = split('/', $spreadsheetFeed->entries[$i]->id->text);
+      if($worksheetEntry->title->text===$worksheetname){
+         $worksheetId = $worksheetIds[8];
          break;
       }
       $i++;
     }
-    return $WorksheetId;
+    return $worksheetId;
   }
 
 
   private function getRowId($service){
     $worksheetname = "RAW";
-    $DocumentQuery = new Zend_Gdata_Spreadsheets_DocumentQuery();
-    $DocumentQuery->setSpreadsheetKey(opConfig::get('op_kintai_spkey'));
-    $SpreadsheetFeed = $service->getWorksheetFeed($DocumentQuery);
+    $documentQuery = new Zend_Gdata_Spreadsheets_DocumentQuery();
+    $documentQuery->setSpreadsheetKey(opConfig::get('op_kintai_spkey'));
+    $spreadsheetFeed = $service->getWorksheetFeed($documentQuery);
     $i = 0;
-    foreach($SpreadsheetFeed->entries as $WorksheetEntry) {
-      $worksheetId = split('/', $SpreadsheetFeed->entries[$i]->id->text);
-      if($WorksheetEntry->title->text===$worksheetname){
-         $WorksheetId = $worksheetId[8];
+    foreach ($spreadsheetFeed->entries as $worksheetEntry)
+    {
+      $worksheetIds = split('/', $spreadsheetFeed->entries[$i]->id->text);
+      if ($worksheetEntry->title->text===$worksheetname)
+      {
+         $worksheetId = $worksheetIds[8];
          break;
       }
       $i++;
     }
-    return $WorksheetId;
+    return $worksheetId;
   }
 }
