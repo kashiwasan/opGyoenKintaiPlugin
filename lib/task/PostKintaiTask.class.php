@@ -8,15 +8,32 @@ class PostKintaiTask extends sfBaseTask
     $this->namespace = 'opKintai';
     $this->name      = 'execute';
     $this->aliases = array('kintai-bot');
+    $this->addOptions(array(
+      new sfCommandOption('start-member-id', null, sfCommandOption::PARAMETER_OPTIONAL, 'Start member id', null),
+      new sfCommandOption('end-member-id', null, sfCommandOption::PARAMETER_OPTIONAL, 'End member id', null),
+    ));
     $this->breafDescription  = 'execute opGyoenKintaiPlugin bot';
   }
 
   public function execute($arguments = array(), $options = array()){
     echo "START KINTAI BOT.\n";
     $details = array();
-    $databaseManager = 	new sfDatabaseManager($this->configuration);
+    $databaseManager = new sfDatabaseManager($this->configuration);
+    //$connection = Doctrine_Manager::connection();
     $service = self::getZendGdata();
-    $members = Doctrine::getTable('Member')->findAll();
+    $p = array();
+    $dql = Doctrine_Query::create()->from("Member m")->where("m.is_active = ?","1");
+    if (!is_null($options['start-member-id']) && is_numeric($options['start-member-id']))
+    {
+      $dql = $dql->andWhere('m.id > ?', $options['start-member-id']);
+    }
+    if (!is_null($options['end-member-id']) && is_numeric($options['end-member-id']))
+    {
+      $dql = $dql->andWhere('m.id < ?', $options['end-member-id']);
+    }
+    $members = $dql->execute();
+    // $members = Doctrine::getTable('Member')->findAll();
+    // var_dump($members);
     $rawKey = opConfig::get('op_kintai_spkey', null);
     $wid = self::getRowId($service, $rawKey);
     foreach($members as $member){
@@ -64,30 +81,43 @@ class PostKintaiTask extends sfBaseTask
                   switch($key){
                     case "date":
                       $date = $line->getText();
+                      break;
                     case "ssh":
                       $ssh = $line->getText();
+                      break;
                     case "ssm":
                       $ssm = $line->getText();
+                      break;
                     case "seh":
                       $seh = $line->getText();
+                      break;
                     case "sem":
                       $sem = $line->getText();
+                      break;
                     case "srh":
                       $srh = $line->getText();
+                      break;
                     case "srm":
                       $srm = $line->getText();
+                      break;
                     case "zsh":
                       $zsh = $line->getText();
+                      break;
                     case "zsm":
                       $zsm = $line->getText();
+                      break;
                     case "zeh":
                       $zeh = $line->getText();
+                      break;
                     case "zem":
                       $zem = $line->getText();
+                      break;
                     case "zrh":
                       $zrh = $line->getText();
+                      break;
                     case "zrm":
                       $zrm = $line->getText();
+                      break;
                     default:
                       // 何もしない。                      
                   }
@@ -136,30 +166,43 @@ class PostKintaiTask extends sfBaseTask
                   switch($key){
                     case "date":
                       $date = $line->getText();
+                      break;
                     case "ssh":
                       $ssh = $line->getText();
+                      break;
                     case "ssm":
                       $ssm = $line->getText();
+                      break;
                     case "seh":
                       $seh = $line->getText();
+                      break;
                     case "sem":
                       $sem = $line->getText();
+                      break;
                     case "srh":
                       $srh = $line->getText();
+                      break;
                     case "srm":
                       $srm = $line->getText();
+                      break;
                     case "zsh":
                       $zsh = $line->getText();
+                      break;
                     case "zsm":
                       $zsm = $line->getText();
+                      break;
                     case "zeh":
                       $zeh = $line->getText();
+                      break;
                     case "zem":
                       $zem = $line->getText();
+                      break;
                     case "zrh":
                       $zrh = $line->getText();
+                      break;
                     case "zrm":
                       $zrm = $line->getText();
+                      break;
                     default:
                       // 何もしない。                      
                   }
@@ -226,10 +269,13 @@ class PostKintaiTask extends sfBaseTask
                   switch($key){
                     case "date":
                       $date = $line->getText();
+                      break;
                     case "data":
                       $data = $line->getText();
+                      break;
                     case "comment":
                       $comment = $line->getText();
+                      break;
                     default:
                       // 何もしない。                      
                   }
@@ -385,10 +431,13 @@ class PostKintaiTask extends sfBaseTask
                   switch($key){
                     case "date":
                       $date = $line->getText();
+                      break;
                     case "data":
                       $data = $line->getText();
+                      break;
                     case "comment":
                       $comment = $line->getText();
+                      break;
                     default:
                       // 何もしない。                      
                   }
