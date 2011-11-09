@@ -1,14 +1,14 @@
 <div id="easymode">
 <div class="partsHeading"><h3><?php echo $nickname; ?>さんの今日の勤怠を登録する</h3></div>
 <div class="block">
-
+<form action="./kintai/ajaxRegist" method="post">
 <span style="color: #F00">（簡単入力モード）</span>
 <div id="kintai_easy_regist_loading" style="display: none;"><img src="./opGyoenKintaiPlugin/js/loading.gif" alt="Now Loading..." /></div>
 <div id="easy_regist_msg"></div>
+<input type="hidden" name="y" value="<?php echo $y; ?>" />
+
 <table>
 <tr><td>勤怠入力する日付</td><td><?php echo $y; ?>年 <?php echo $m; ?>月 <?php echo $d; ?>日</td></tr>
-<form action="./kintai/ajaxRegist" id="kintai_easy_regist_form" method="POST">
-<input type="hidden" name="y" value="<?php echo $y; ?>" />
 <input type="hidden" name="m" value="<?php echo $m; ?>" />
 <input type="hidden" name="d" value="<?php echo $d; ?>" />
 <tr>
