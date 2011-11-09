@@ -2,7 +2,7 @@
 <div class="partsHeading"><h3><?php echo $nickname; ?>さんの今日の勤怠を登録する</h3></div>
 <div class="block">
 <form action="./kintai/ajaxRegist" method="post">
-<span style="color: #F00">（簡単入力モード）</span>
+<span style="color: #F00">（素人入力モード）</span>
 <div id="kintai_easy_regist_loading" style="display: none;"><img src="./opGyoenKintaiPlugin/js/loading.gif" alt="Now Loading..." /></div>
 <div id="easy_regist_msg"></div>
 <input type="hidden" name="y" value="<?php echo $y; ?>" />

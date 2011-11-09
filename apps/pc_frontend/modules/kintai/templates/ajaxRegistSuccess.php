@@ -46,7 +46,7 @@ $(function(){
 
 <tr><td><label for="comment">作業内容コメント</label></td><td><textarea name="comment" id="kintai_regist_comment"><?php echo $comment; ?></textarea></td></tr>
 <tr><td></td><td><input type="submit" name="submit" id="kintai_regist_submit" value="確認する" /></td></tr></table>
-<a href="./kintai/ajaxRegistEasy?y=<?php echo $y; ?>&m=<?php echo $m; ?>&d=<?php echo $d; ?>" rel="internal">簡単入力モードにする</a><br />
+<a href="./kintai/ajaxRegistEasy?y=<?php echo $y; ?>&m=<?php echo $m; ?>&d=<?php echo $d; ?>" rel="internal">素人入力モードにする</a><br />
 
 <div id="kintai_explain_open"><a id="kintai_explain_open_link">▼勤怠入力の説明</a></div>
 <div id="kintai_explain" style="display: none;">
