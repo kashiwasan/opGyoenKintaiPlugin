@@ -51,19 +51,19 @@ $(function(){
 <br />
 <div id="kintai_explain_open"><a id="kintai_explain_open_link" href="#">▼勤怠入力の説明</a></div>
 <div id="kintai_explain" style="display: none;">
-<h4>勤怠入力の方法</h4>
-例１）会社に<span class="op_font" style="color:#00FF00;"><span class="op_font" style="font-size:large">出社</span></span>して、<span class="op_font" style="color:#3366FF;"><span class="op_font" style="font-size:large">10:00</span></span>に出勤、<span class="op_font" style="color:#FF0000;"><span class="op_font" style="font-size:large">25:00(翌日)</span></span>に退勤した場合。<br />
-<span class="op_font" style="color:#00FF00;">出勤</span>なので、
-<span class="op_font" style="font-size:large"><span class="op_font" style="color:#00FF00;">S</span><span class="op_font" style="color:#3366FF;">1000</span><span class="op_font" style="color:#FF0000;">2500</span></span>
-と入力します。<br />
+<a id="kintai_explain_close_link" href="#">▲説明を閉じる</a><br /
+<div style="font-size: 10px;">
+<div>　【勤怠入力について】</div>ここにいくつかサンプルを載せますので、これを参考にしながら入力してください。<br />
+<u>例１・オフィスに<font color="#ff00ff">出社(S)</font>して、<span style="background-color:rgb(255, 255, 255)"><font color="#ff0000">１０時００分</font></span>入り、<font color="#0000ff">１９時３０分</font>退勤、１時間（<font color="#38761d">６０分</font>）の休憩の場合</u><br />
+→ <font size="3"><font color="#ff00ff">S</font><font color="#ff0000">1000</font><font color="#0000ff">1930</font><font color="#38761d">060</font></font>　と入力します。<br />
 <br />
-例２）<span class="op_font" style="color:#CC99FF;"><span class="op_font" style="font-size:large">在宅</span></span>で<span class="op_font" style="color:#3366FF;"><span class="op_font" style="font-size:large">09:00</span></span>から<span class="op_font" style="color:#FF0000;"><span class="op_font" style="font-size:large">16:00</span></span>まで働いた場合<br /> 
-<span class="op_font" style="color:#CC99FF;">在宅</span>なので、
-<span class="op_font" style="font-size:large"><span class="op_font" style="color:#CC99FF;">Z</span><span class="op_font" style="color:#3366FF;">0900</span><span class="op_font" style="color:#FF0000;">1600</span></span>
-と入力します。<br />
-・「<b>休憩時間</b>」は、休憩した時間（分単位）を入力してください。<br />
-・「<b>コメント</b>」は、今日１日行った業務を簡潔に入力してください。<br />
+<u>例２・<font color="#ffff00" style="background-color:rgb(0, 0, 0)">在宅作業(Z)</font>で<font color="#d5a6bd" style="background-color:rgb(0, 0, 0)">２４時１０分</font>から始めて、<span style="background-color:rgb(0, 0, 0)"><font color="#00ffff">２６時００分</font></span>に終わり、<span style="background-color:rgb(0, 0, 0)"><font color="#e69138">休憩なし(０分)</font></span>の場合</u><br />
+→ <font size="3" style="background-color:rgb(0, 0, 0)"><font color="#ffff00">Z</font><font color="#d5a6bd">2410</font><font color="#00ffff">2600</font><font color="#f6b26b">000</font></font>　と入力します。
+<br /><br />
+<u>例３・オフィスに出社(S)したときは１０時入りの１９時退勤、１時間の休憩、同じ日に在宅(Z)ノマドで<span style="background-color:rgb(0, 0, 0)"><font color="#ffffff">21時</font></span>から始めて<span style="background-color:rgb(0, 0, 0)"><font color="#ffffff">24時</font></span>に終わり<span style="background-color:rgb(0, 0, 0)"><font color="#ffffff">休憩３０分</font></span>の場合</u><br />
+→ <font size="3"><u>S10001900060<span style="background-color:rgb(0, 0, 0)"><font color="#ffffff">Z21002400030</font></span></u></font>　と入力します。※自宅作業と在宅作業を同時に入力できます。<br /><font size="3"><u><span style="background-color:rgb(0, 0, 0)"><font color="#ffffff">Z21002400030</font></span>S10001900060</u></font>と入力しても問題ないです。<br />
+ヒント：「簡単入力モード」というところから、従来の旧インナーと同じ形式で勤怠入力することもできます。
+</div>
 <br />
-<a id="kintai_explain_close_link" href="#">▲説明を閉じる</a><br />
 </div>
 </div>
