@@ -46,9 +46,10 @@ $(function(){
 
 <tr><td><label for="comment">作業内容コメント</label></td><td><textarea name="comment" id="kintai_regist_comment"><?php echo $comment; ?></textarea></td></tr>
 <tr><td></td><td><input type="submit" name="submit" id="kintai_regist_submit" value="確認する" /></td></tr></table>
-<a href="./kintai/ajaxRegistEasy?y=<?php echo $y; ?>&m=<?php echo $m; ?>&d=<?php echo $d; ?>" rel="internal">素人入力モードにする</a><br />
-
-<div id="kintai_explain_open"><a id="kintai_explain_open_link">▼勤怠入力の説明</a></div>
+<br />
+<form action="./kintai/ajaxRegistEasy?y=<?php echo $y; ?>&m=<?php echo $m; ?>&d=<?php echo $d; ?>"><input type="submit" value="素人入力モード" /></form>
+<br />
+<div id="kintai_explain_open"><a id="kintai_explain_open_link" href="#">▼勤怠入力の説明</a></div>
 <div id="kintai_explain" style="display: none;">
 <h4>勤怠入力の方法</h4>
 例１）会社に<span class="op_font" style="color:#00FF00;"><span class="op_font" style="font-size:large">出社</span></span>して、<span class="op_font" style="color:#3366FF;"><span class="op_font" style="font-size:large">10:00</span></span>に出勤、<span class="op_font" style="color:#FF0000;"><span class="op_font" style="font-size:large">25:00(翌日)</span></span>に退勤した場合。<br />
@@ -63,6 +64,6 @@ $(function(){
 ・「<b>休憩時間</b>」は、休憩した時間（分単位）を入力してください。<br />
 ・「<b>コメント</b>」は、今日１日行った業務を簡潔に入力してください。<br />
 <br />
-<a id="kintai_explain_close_link">▲説明を閉じる</a><br />
+<a id="kintai_explain_close_link" href="#">▲説明を閉じる</a><br />
 </div>
 </div>

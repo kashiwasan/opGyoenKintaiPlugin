@@ -140,8 +140,10 @@
 </td></tr><tr>
 <td>作業内容</td><td><textarea name="comment" id="kintai_easy_regist_comment"></textarea></td></tr>
 <tr><td></td><td><input type="submit" name="submit" id="kintai_easy_regist_submit" value="確認する" /></td></tr></table>
+</form><br />
+<form action="./kintai/ajaxRegist?y=<?php echo $y; ?>&m=<?php echo $m; ?>&d=<?php echo $d; ?>" method="POST">
+<input type="submit" value="通常入力に戻る" /><br />
 </form>
-<a href="./kintai/ajaxRegist?y=<?php echo $y; ?>&m=<?php echo $m; ?>&d=<?php echo $d; ?>" rel="internal">通常入力に戻る</a> <br />
 </div>
 </div>
 <div id="normalmode"></div>
