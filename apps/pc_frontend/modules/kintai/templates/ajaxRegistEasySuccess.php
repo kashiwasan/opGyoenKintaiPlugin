@@ -105,7 +105,7 @@
 <tr>
 <td>休憩時間(分)</td><td>
 <select name="rest" id="kintai_easy_regist_rest">
-<option value="000" selected="selected">00</option>
+<option value="000">00</option>
 <option value="005">05</option>
 <option value="010">10</option>
 <option value="015">15</option>
@@ -117,7 +117,7 @@
 <option value="045">45</option>
 <option value="050">50</option>
 <option value="055">55</option>
-<option value="060">60</option>
+<option value="060" selected="selected">60</option>
 <option value="065">65</option>
 <option value="070">70</option>
 <option value="075">75</option>
