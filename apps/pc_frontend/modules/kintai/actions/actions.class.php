@@ -60,7 +60,26 @@ class kintaiActions extends sfActions
       $line = $service->getListFeed($q);
       if ($line->entries["0"])
       {
-        $data[]= array('date'=> $date, 'flg' => 1,);
+        foreach ($line as $list)
+        {
+          $cols = $list->getCustom();
+          foreach ($cols as $col)
+          {
+            $key = $col->getColumnName();
+            switch ($key)
+            {
+              case "data" :
+                $meisai = $col->getText();
+                break;
+              case "comment" :
+                $comment = $col->getText();
+                break;
+              default :
+                // none
+            }
+          }
+        }
+        $data[]= array('date'=> $date, 'flg' => 1, 'meisai' => $meisai, 'comment' => $comment);
       }
       else
       {
