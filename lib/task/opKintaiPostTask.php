@@ -36,7 +36,7 @@ class opKintaiPostTask extends sfBaseTask
     }
     if (!is_null($options['end-member-id']) && is_numeric($options['end-member-id']))
     {
-      $dql = $dql->andWhere('m.id =< ?', $options['end-member-id']);
+      $dql = $dql->andWhere('m.id <= ?', $options['end-member-id']);
     }
     $members = $dql->execute();
     $rawKey = opConfig::get('op_kintai_spkey', null);
