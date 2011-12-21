@@ -25,11 +25,11 @@ class PostKintaiTask extends sfBaseTask
     $dql = Doctrine_Query::create()->from("Member m")->where("m.is_active = ?","1");
     if (!is_null($options['start-member-id']) && is_numeric($options['start-member-id']))
     {
-      $dql = $dql->andWhere('m.id > ?', $options['start-member-id']);
+      $dql = $dql->andWhere('m.id >= ?', $options['start-member-id']);
     }
     if (!is_null($options['end-member-id']) && is_numeric($options['end-member-id']))
     {
-      $dql = $dql->andWhere('m.id < ?', $options['end-member-id']);
+      $dql = $dql->andWhere('m.id <= ?', $options['end-member-id']);
     }
     $members = $dql->execute();
     // $members = Doctrine::getTable('Member')->findAll();
