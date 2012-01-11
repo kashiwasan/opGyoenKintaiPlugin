@@ -401,9 +401,9 @@ class kintaiActions extends sfActions
       $y = $request->getParameter('y');
       $m = $request->getParameter('m');
       $d = $request->getParameter('d');
+      $memberId = $this->getUser()->getMemberId();
       $data = $request->getParameter('data');
       $comment = $request->getParameter('comment');
-      $memberId = $this->getUser()->getMemberId();
       $keitai = substr($data, 0, 1);
       $start = array();
       $end = array();
@@ -413,25 +413,30 @@ class kintaiActions extends sfActions
       $end["minute"] = substr($data, 7, 2);
       $start["time"] = $start["hour"] * 60 + $start["minute"];
       $end["time"] = $end["hour"] * 60 + $end["minute"];
-      $rest = substr($data, 9 , 3);
+      $rest = substr($data, 9, 3);
+      if (substr($rest, 0, 1)=="0")
+      {
+        $rest = substr($rest, 1, 2);
+      }
       $jitsumu = $end["time"] - $start["time"] - $rest;
-
+      
       if (strlen($data)==24)
       { 
-        $start2["hour"]= substr($data, 12, 2);
-        $start2["minute"] = substr($data, 14, 2);
-        $end2["hour"] = substr($data, 16, 2);
-        $end2["minute"] = substr($data, 18, 2);
+        $keitai2 = substr($data, 12, 1);
+        $start2["hour"]= substr($data, 13, 2);
+        $start2["minute"] = substr($data, 15, 2);
+        $end2["hour"] = substr($data, 17, 2);
+        $end2["minute"] = substr($data, 19, 2);
         $start2["time"] = $start2["hour"] * 60 + $start2["minute"];
         $end2["time"] = $end2["hour"] * 60 + $end2["minute"];
-        $rest2 = substr($data, 20, 3);
+        $rest2 = substr($data, 21, 3);
         if (substr($rest2, 0, 1)=="0")
         {
           $rest2 = substr($rest2, 1, 2);
         }
         $jitsumu2 = $end2["time"] - $start2["time"] - $rest2;
       }
-      
+
       //Validation
       $message = null;
       if (strlen($data)!=12 && strlen($data)!=24)
@@ -456,7 +461,7 @@ class kintaiActions extends sfActions
       }
       if ($keitai!="S" && $keitai!="Z")
       {
-        $message.= "勤務種別の入力が誤っています。<br />";
+        $message.= "勤務種別の入力が誤っていますaaa。<br />";
       }
  
       if (!$comment)
@@ -467,30 +472,39 @@ class kintaiActions extends sfActions
       {
         if (isset($keitai) && isset($keitai2) && $keitai==$keitai2)
         {
-          $message.= "同じ業務種別です。<br />";
+          $message.= "同じ業務種別です。(2)";
         }
-
         if (!preg_match("/^[0-2][0-9]$/", $start2["hour"]) || !preg_match("/^[0-5][0-9]$/", $start2["minute"]))
         {
-          $message.= "始業時間の入力が誤っています。<br />";
+          $message.= "始業時間の入力が誤っています。(2)<br />";
         }
         if (!preg_match("/^[0-2][0-9]$/", $end2["hour"]) || !preg_match("/^[0-5][0-9]$/", $end2["minute"]))
         {
-          $message.= "終業時間の入力が誤っています。<br />";
+          $message.= "終業時間の入力が誤っています。(2)<br />";
         }
         if ($jitsumu<=0)
         {
-          $message.= "実務時間が0分となってしまいます。入力を見なおしてください。<br />";
-        }   
+          $message.= "実務時間が0分となってしまいます。入力を見なおしてください。(2)<br />";
+        } 
         if (!preg_match("/^\d{2,3}$/", $rest2))
         {
-          $message.= "休憩時間の入力が誤っています。<br />";
-        }
+          $message.= "休憩時間の入力が誤っています。(2)<br />";
+        }  
         if ($keitai2!="S" && $keitai2!="Z")
         {
-          $message.= "同じ勤務種別は入力できません。<br />";
+          $message.= "勤務種別の入力が誤っています。(2)<br />";
         }
       }
+
+      $unixtime = mktime(0, 0, 0, $m, $d, $y);
+      $nowtime = time();
+      $pasttime = $unixtime - $nowtime;
+      $allowtime = opConfig::get('op_kintai_allowdate', '3');
+      if ($pasttime>$allowtime)
+      {
+        $message.= "勤怠の登録期限がすでに過ぎてしまっています。<br />";
+      }
+
       $q = new Zend_Gdata_Spreadsheets_ListQuery();
       $q->setSpreadsheetKey(opConfig::get('op_kintai_spkey', null));
       $q->setWorksheetId($wid);
