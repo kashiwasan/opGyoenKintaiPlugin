@@ -2,7 +2,7 @@
 <div class='block'>
 <?php if (is_null($member_editablelink) && $currentMember==$viewMember) : ?>
 <table width='100%'>
-<tr><td width='20%'>年月日</td><td width='20%'></td><td width="35%"></td><td width='25%'></td></tr>
+<tr><td width='20%'>年月日</td><td width='20%'></td><td width='35%'></td><td width='25%'></td></tr>
 
 <?php
 
@@ -21,7 +21,7 @@ foreach ($data as $line)
   }
 }
 
-$htmls = implode('\n', $html);
+$htmls = implode("\n", $html);
 echo($htmls);
 
 ?>
