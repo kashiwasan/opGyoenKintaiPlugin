@@ -40,8 +40,34 @@ class kintaiActions extends sfActions
       sfConfig::set('sf_nav_id', $member_id);
     }
     $this->member_name = $memberS->getName();
-    $wid = self::getRowId($service);
+    $memberSpreadSheetKey = self::getMemberMasterSpreadSheetKey($service, $member_id);
+    $domain = null;
+    if (!is_null(opConfig::get('op_kintai_apps_domain', null)))
+    {
+      $domain = 'a/'.opConfig::get('op_kintai_apps_domain').'/';
+    }
+    $this->member_splink = "https://docs.google.com/".$domain."spreadsheet/ccc?key=".$memberSpreadSheetKey."&hl=ja";
+    $memberEditableKey = self::getMemberSpreadSheetKey($service, $member_id);
+    if (!is_null($memberEditableKey))
+    {
+      $this->member_editablelink = "https://docs.google.com/".$domain."spreadsheet/ccc?key=".$memberEditableKey."&hl=ja";
+    }
+    else
+    {
+      $this->member_editablelink = null;
+    }
+    $this->data = $data;
+    $this->currentMember = $this->getUser()->getMemberId();
+    $this->viewMember = $member_id;
+    return sfView::SUCCESS;
+  }
 
+  public function executeAjaxList(sfWebRequest $request)
+  {
+    $service = self::getZendGdata();
+    $wid = self::getRowId($service);
+    $id = $request->getParameter('id');
+    $member_id = isset($id) ? $id : $this->getUser()->getMemberId();
     for ($i=0;$i<3;$i++)
     {
       if($i==0){
@@ -58,6 +84,7 @@ class kintaiActions extends sfActions
       $query = "id={$member_id} and date={$date}";
       $q->setSpreadsheetQuery($query);
       $line = $service->getListFeed($q);
+      list($y, $m, $d) = split('/', $date);
       if ($line->entries["0"])
       {
         foreach ($line as $list)
@@ -79,34 +106,85 @@ class kintaiActions extends sfActions
             }
           }
         }
-        $data[]= array('date'=> $date, 'flg' => 1, 'meisai' => $meisai, 'comment' => $comment);
+        list($keitai, $start, $end, $rest, $jitsumu, $keitai2, $start2, $end2, $rest2, $jitsumu2) = array( null, array(), array(), null, null, null, array(), array(), null, null, ); 
+        $keitai = substr($meisai, 0, 1);
+        $start = array();
+        $end = array();
+        $start["hour"]= substr($meisai, 1, 2); 
+        $start["minute"] = substr($meisai, 3, 2); 
+        $end["hour"] = substr($meisai, 5, 2); 
+        $end["minute"] = substr($meisai, 7, 2); 
+        $start["time"] = $start["hour"] * 60 + $start["minute"];
+        $end["time"] = $end["hour"] * 60 + $end["minute"];
+        $rest = substr($meisai, 9, 3); 
+        if (substr($rest, 0, 1)=="0")
+        {   
+          $rest = substr($rest, 1, 2); 
+        }
+        $jitsumu = $end["time"] - $start["time"] - $rest;
+        if (strlen($meisai)==24)
+        {
+          $keitai2 = substr($meisai, 12, 1);
+          $start2["hour"]= substr($meisai, 13, 2);
+          $start2["minute"] = substr($meisai, 15, 2);
+          $end2["hour"] = substr($meisai, 17, 2);
+          $end2["minute"] = substr($meisai, 19, 2);
+          $start2["time"] = $start2["hour"] * 60 + $start2["minute"];
+          $end2["time"] = $end2["hour"] * 60 + $end2["minute"];
+          $rest2 = substr($meisai, 21, 3);
+          if (substr($rest2, 0, 1)=="0")
+          {
+            $rest2 = substr($rest2, 1, 2);
+          }
+          $jitsumu2 = $end2["time"] - $start2["time"] - $rest2;
+        }
+        if ($keitai=="S")
+        {
+          $kintai1 = (string) $start['hour'].':'.$start['minute'].' - '.$end['hour'].':'.$end['minute'];
+          $rest1 = (string) $rest;
+          if ($keitai2 && $keitai2=="Z")
+          {
+            $kintai2 = (string) $start2['hour'].':'.$start2['minute'].' - '.$end2['hour'].':'.$end2['minute'];
+            $rest2 = (string) $rest2;
+          }
+        }
+        if ($keitai=="Z")
+        {
+          $kintai2 = (string) $start['hour'].':'.$start['minute'].' - '.$end['hour'].':'.$end['minute'];
+          $rest2 = (string) $rest;
+          if ($keitai2 && $keitai2=="S")
+          {
+            $kintai1 = (string) $start2['hour'].':'.$start2['minute'].' - '.$end2['hour'].':'.$end2['minute'];
+            $rest1 = (string) $rest2;
+          }
+        }
+
+        $data[] = array(
+          'date' => $date,
+          'y' => $y,
+          'm' => $m,
+          'd' => $d,
+          'kintai1' => $kintai1,
+          'rest1' => $rest1,
+          'kintai2' => $kintai2,
+          'rest2' => $rest2,
+          'comment' => $comment,
+          'flag' => 1,
+        );
       }
       else
       {
-        $data[]= array('date'=> $date, 'flg' => 0,);
+        $data[]= array(
+          'date'=> $date,
+          'y' => $y,
+          'm' => $m,
+          'd' => $d,
+          'flag' => 0
+        );
       }
     }
-    
-    $memberSpreadSheetKey = self::getMemberMasterSpreadSheetKey($service, $member_id);
-    $domain = null;
-    if (!is_null(opConfig::get('op_kintai_apps_domain', null)))
-    {
-      $domain = 'a/'.opConfig::get('op_kintai_apps_domain').'/';
-    }
-    $this->member_splink = "https://docs.google.com/".$domain."spreadsheet/ccc?key=".$memberSpreadSheetKey."&hl=ja";
-    $memberEditableKey = self::getMemberSpreadSheetKey($service, $member_id);
-    if (!is_null($memberEditableKey))
-    {
-      $this->member_editablelink = "https://docs.google.com/".$domain."spreadsheet/ccc?key=".$memberEditableKey."&hl=ja";
-    }
-    else
-    {
-      $this->member_editablelink = null;
-    }
-    $this->data = $data;
-    $this->currentMember = $this->getUser()->getMemberId();
-    $this->viewMember = $member_id;
-    return sfView::SUCCESS;
+
+    return $this->renderText(json_encode(array('status' => 'success', 'data' => $data)));    
   }
 
   public function executeRegist(sfWebRequest $request)

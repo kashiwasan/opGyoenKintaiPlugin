@@ -63,6 +63,14 @@ kintai_member_downloadCSV:
   requirements:
     sf_method: [get, post]
 
+kintai_ajax_list:
+  url:   /kintai/ajaxList
+  class:   opDynamicAclRoute
+  param: { module: kintai, action: ajaxList }
+  options: { model: Member, type: object, privilege: view }
+  requirements:
+    sf_method: [get, post]
+
 kintai_default_error:
   url: /kintai/*
   param: { module: default, action: error }
