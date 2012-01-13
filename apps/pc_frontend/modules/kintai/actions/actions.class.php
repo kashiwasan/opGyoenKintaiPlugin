@@ -539,7 +539,7 @@ class kintaiActions extends sfActions
       }
       if ($keitai!="S" && $keitai!="Z")
       {
-        $message.= "勤務種別の入力が誤っていますaaa。<br />";
+        $message.= "勤務種別の入力が誤っています(2)。<br />";
       }
  
       if (!$comment)
