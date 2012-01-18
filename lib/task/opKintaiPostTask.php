@@ -13,7 +13,7 @@ class opKintaiPostTask extends sfBaseTask
     mb_language('Japanese');
     mb_internal_encoding('utf-8');
     $this->namespace = 'opKintai';
-    $this->name      = 'execute';
+    $this->name      = 'execute2';
     $this->aliases = array('kintai-bot');
     $this->addOptions(array(
       new sfCommandOption('start-member-id', null, sfCommandOption::PARAMETER_OPTIONAL, 'Start member id', null),
