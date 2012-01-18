@@ -106,7 +106,7 @@ class kintaiActions extends sfActions
             }
           }
         }
-        list($keitai, $start, $end, $rest, $jitsumu, $keitai2, $start2, $end2, $rest2, $jitsumu2) = array( null, array(), array(), null, null, null, array(), array(), null, null, ); 
+        list($keitai, $start, $end, $rest, $jitsumu, $keitai2, $start2, $end2, $rest2, $jitsumu2, $kintai1, $kintai2) = array( null, array(), array(), null, null, null, array(), array(), null, null, null, null);
         $keitai = substr($meisai, 0, 1);
         $start = array();
         $end = array();
