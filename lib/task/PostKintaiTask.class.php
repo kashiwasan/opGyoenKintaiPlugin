@@ -63,7 +63,7 @@ class PostKintaiTask extends sfBaseTask
           $year = $year - 1;
         }
         // 先月分の勤怠を処理する。
-        for($i=1;$i<31;$i++){
+        for($i=1;$i<=31;$i++){
           if(checkdate($previousMonth, $i, $year)){
             $q = new Zend_Gdata_Spreadsheets_ListQuery();
             $q->setSpreadsheetKey($memberspkey);
@@ -245,7 +245,7 @@ class PostKintaiTask extends sfBaseTask
         }
 
         // 先月分の勤怠を処理する。
-        for($i=1;$i<31;$i++){
+        for($i=1;$i<=31;$i++){
           if(checkdate($previousMonth, $i, $year)){
             $j = $i;
             if(strlen($j)==1){
