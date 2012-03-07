@@ -295,7 +295,7 @@ class PostKintaiTask extends sfBaseTask
                     if ($srh==0){
                       $srh = "0";
                     }
-                    if ($zrm==0){
+                    if ($srm==0){
                       $srm = "0";
                     }
                   }else{
@@ -357,7 +357,7 @@ class PostKintaiTask extends sfBaseTask
                     if ($srh==0){
                       $srh = "0";
                     }
-                    if ($zrm==0){
+                    if ($srm==0){
                       $srm = "0";
                     }
                   }else{
