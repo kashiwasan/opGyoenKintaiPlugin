@@ -68,15 +68,12 @@ class kintaiActions extends sfActions
     $wid = self::getRowId($service);
     $id = $request->getParameter('id');
     $member_id = isset($id) ? $id : $this->getUser()->getMemberId();
+    $moreDay = (string)$request->getParameter('day', 0);
+    $standardDay = date('Y-m-d', strtotime(date('Y-m-d').' -'.$moreDay.' days'));
     for ($i=0;$i<3;$i++)
     {
-      if($i==0){
-        $date = date('Y/m/d', strtotime('now'));
-      }elseif($i==1){
-        $date = date('Y/m/d', strtotime('yesterday'));
-      }else{
-        $date = date('Y/m/d', strtotime("-{$i} days"));
-      }
+      $date = date('Y/m/d', strtotime($standardDay.' -'.$i.' days'));
+
       //throw query
       $q = new Zend_Gdata_Spreadsheets_ListQuery();
       $q->setSpreadsheetKey(opConfig::get('op_kintai_spkey', null));
@@ -159,6 +156,18 @@ class kintaiActions extends sfActions
           }
         }
 
+        $fromDate = strtotime($standardDay.' -'.$i.' days');
+        $toDate = strtotime(date('Y-m-d'));
+        $intervalDate = floor(($toDate - $fromDate) / 3600 / 24);
+        if ($intervalDate >= 3)
+        {
+          $flag = 0;
+        }
+        else
+        {
+          $flag = 1;
+        }
+
         $data[] = array(
           'date' => $date,
           'y' => $y,
@@ -169,17 +178,30 @@ class kintaiActions extends sfActions
           'kintai2' => $kintai2,
           'rest2' => $rest2,
           'comment' => $comment,
-          'flag' => 1,
+          'flag' => $flag,
         );
       }
       else
       {
+
+        $fromDate = strtotime($standardDay.' -'.$i.' days');
+        $toDate = strtotime(date('Y-m-d'));
+        $intervalDate = floor(($toDate - $fromDate) / 3600 / 24);
+        if ($intervalDate >= 3)
+        {
+          $flag = 0;
+        }
+        else
+        {
+          $flag = 2;
+        }
+
         $data[]= array(
           'date'=> $date,
           'y' => $y,
           'm' => $m,
           'd' => $d,
-          'flag' => 0
+          'flag' => $flag
         );
       }
     }
