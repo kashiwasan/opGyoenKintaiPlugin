@@ -4,11 +4,12 @@ $(function(){
   $('#kintai-loader').show();
   var baseUrl = $('#kintai-list').attr('data-baseurl');
   $.getJSON( baseUrl + 'kintai/ajaxList', { 'day': '0' }, renderJSON);
-  $('#kintai-more-button').attr('data-moreday', '3');
+  $('#kintai-more-button').attr('data-moreday', 3);
   $('#kintai-more-button').click(function(){
     $('#kintai-loader').show();
     $('#kintai-more').hide();
     var moreDay = $(this).attr('data-moreday');
+    moreDay = parseInt(moreDay);
     $.getJSON( baseUrl + 'kintai/ajaxList', { 'day': moreDay,  }, renderJSON);
     moreDay = moreDay + 3;
     $('#kintai-more-button').attr('data-moreday', moreDay);
