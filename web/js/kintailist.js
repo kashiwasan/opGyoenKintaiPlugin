@@ -16,12 +16,12 @@ $(function(){
   });
 });
 function renderJSON(json) {
-  $('#kintai-list-template').tmpl(json.data).appendTo('#kintai-list');
+  $htmlData = $('#kintai-list-template').tmpl(json.data);
   $('#kintai-loader').hide();
   $('#kintai-more').show();
   $('#kintai-list').show();
   $('#kintai-more').show();
-  $("a[rel^='prettyPopinEdit']").prettyPopin({
+  $("a[rel^='prettyPopinEdit']", $htmlData).prettyPopin({
     width: 500,
     height: false,
     callback: function(){
@@ -33,7 +33,7 @@ function renderJSON(json) {
       $.getJSON( baseUrl + 'kintai/ajaxList', { 'memberId': kintaiMemberId }, renderJSON);
     }
   }); 
-  $("a[rel^='prettyPopinRegist']").prettyPopin({
+  $("a[rel^='prettyPopinRegist']", $htmlData).prettyPopin({
     width: 720,
     height: 550,
     callback: function(){
@@ -45,5 +45,6 @@ function renderJSON(json) {
       $.getJSON( baseUrl + 'kintai/ajaxList', { 'memberId': kintaiMemberId }, renderJSON);
     }
   }); 
+  $htmlData.appendTo('#kintai-list');
 };
 
